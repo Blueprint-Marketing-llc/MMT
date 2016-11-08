@@ -116,7 +116,9 @@ void MMTInterpolatedLM::Load(System &system) {
 FFState *MMTInterpolatedLM::BlankState(MemPool &pool, const System &sys) const {
     mmt::ilm::Phrase phrase(1);
     phrase[0] = kVocabularyStartSymbol;
-    return new(pool.Allocate<ILMState>()) ILMState(m_lm->MakeHistoryKey(phrase, (HistoryKey *) pool.Allocate(m_lm->GetHistoryKeySize())));
+    auto *s = new(pool.Allocate<ILMState>()) ILMState(m_lm->MakeHistoryKey(phrase, (HistoryKey *) pool.Allocate(m_lm->GetHistoryKeySize())));
+    assert(s->state->hash());
+    return s;
 }
 
 void MMTInterpolatedLM::EmptyHypothesisState(FFState &state, const ManagerBase &mgr,
@@ -126,7 +128,9 @@ void MMTInterpolatedLM::EmptyHypothesisState(FFState &state, const ManagerBase &
     phrase[0] = kVocabularyStartSymbol;
     ILMState &ourState = static_cast<ILMState &>(state);
     // to do: if there was no "system pool", this could well just re-use existing state memory. BlankState() has been called on it before.
-    ourState.state = m_lm->MakeHistoryKey(phrase, (HistoryKey *) mgr.GetPool().Allocate(m_lm->GetHistoryKeySize()));
+    //ourState.state = m_lm->MakeHistoryKey(phrase, (HistoryKey *) mgr.GetPool().Allocate(m_lm->GetHistoryKeySize()));
+    ourState.state = m_lm->MakeHistoryKey(phrase, ourState.state);
+    assert(ourState.state->hash());
 }
 
 void
@@ -383,6 +387,7 @@ void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
     scores.PlusEquals(mgr.system, *this, score); // score is already expressed as natural log probability
 
     assert(outState.state == cursorHistoryKey);
+    assert(outState.state->hash());
 }
 
 void MMTInterpolatedLM::InitializeForInput(const Manager &mgr) const {
