@@ -167,14 +167,18 @@ translation_t MosesDecoderImpl::translate(const std::string &text, uint64_t sess
         weights = m_weights;
     }
 
+    Moses2::TranslationResponse response;
     boost::shared_ptr<Moses2::TranslationTask> task(new Moses2::TranslationTask(m_system, text, 0));
     if(translationContext)
         task->SetContextWeights(*translationContext);
     task->SetWeights(weights);
+    task->SetNBestListSize(nbestListSize);
+    task->SetResultCallback([&response](Moses2::TranslationResponse result) {
+        // called from different thread
+        response = result;
+    });
     m_pool.Submit(task);
-    task->Join();
-
-    Moses2::TranslationResponse response = task->GetResult(nbestListSize);
+    task->Join(); // synchronization point for result callback
 
     translation_t translation;
 

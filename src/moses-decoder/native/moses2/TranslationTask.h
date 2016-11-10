@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <map>
 #include <memory>
@@ -31,12 +32,17 @@ public:
   void SetWeights(const std::map<std::string, std::vector<float>> &featureWeights);
   const Weights &GetWeights() const { return m_featureWeights; }
 
-  TranslationResponse GetResult(size_t nbestListSize) const;
+  void SetNBestListSize(size_t nbestListSize) { m_nbestListSize = nbestListSize; }
+  void SetResultCallback(std::function<void(TranslationResponse)> resultCallback) { m_resultCallback = resultCallback; }
 
 protected:
   std::unique_ptr<ManagerBase> m_mgr;
   weightmap_t m_contextWeights;
   Weights m_featureWeights;
+  size_t m_nbestListSize;
+  std::function<void(TranslationResponse)> m_resultCallback;
+
+  TranslationResponse GetResult(size_t nbestListSize) const;
 };
 
 }

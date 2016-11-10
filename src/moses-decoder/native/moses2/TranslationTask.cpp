@@ -11,7 +11,7 @@ namespace Moses2
 
 TranslationTask::TranslationTask(System &system,
 		const std::string &line,
-		long translationId)
+		long translationId) : m_nbestListSize(0)
 {
   if (system.isPb) {
 	  m_mgr.reset(new Manager(system, *this, line, translationId));
@@ -45,6 +45,18 @@ void TranslationTask::Run()
     out = m_mgr->OutputTransOpt();
     m_mgr->system.detailedTranslationCollector->Write(m_mgr->GetTranslationId(), out);
   }
+
+  if(m_resultCallback)
+    m_resultCallback(GetResult(m_nbestListSize));
+
+  // note that thread-local objects (memory pools) hold Hypotheses that we release
+  // when we return here and signal Task completion to the ThreadPool.
+  // Hence, the TranslationTask becomes invalid afterwards.
+
+
+  // avoid trouble with a late destructor call to ~Manager, ~Search, ~Stack.
+  // destroy now, before we release the global memory stuff.
+  m_mgr.reset();
 }
 
 void TranslationTask::SetWeights(const std::map<std::string, std::vector<float>> &featureWeights)
