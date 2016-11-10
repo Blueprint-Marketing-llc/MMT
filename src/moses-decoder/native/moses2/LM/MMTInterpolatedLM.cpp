@@ -63,12 +63,6 @@ public:
 
     ILMState(HistoryKey *st) : state(st) {}
 
-    virtual ~ILMState() {
-        // state holds pool-backed memory, so no need to release it (and MUST NOT be deleted)
-        state->~HistoryKey();
-        // note: dtor call not needed for POD-only state
-    }
-
     virtual std::string ToString() const override {
       stringstream ss;
       ss << state;
@@ -335,7 +329,6 @@ void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
                                              cursorHistoryKey ? cursorHistoryKey : initialState,
                                              context_vec, &outHistoryKey);
 
-        buf1->~HistoryKey(); // only needed for non-POD
         swap(buf0, buf1);
 
         cursorHistoryKey = outHistoryKey;
@@ -357,13 +350,9 @@ void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
         //if the phrase is too short, one StartSentenceSymbol (see startGaps) is added
         SetWordVector(hypo, ngram_vec, startGaps, 0, adjust_begin, end);
 
-        if (cursorHistoryKey)
-            cursorHistoryKey->~HistoryKey(); // only needed for non-POD
-
         uint8_t bufferTmp[lm->GetHistoryKeySize()];
         HistoryKey *tmpHistoryKey = lm->MakeHistoryKey(ngram_vec, (HistoryKey *) bufferTmp);
         score += lm->ComputeProbability(kVocabularyEndSymbol, tmpHistoryKey, t_context_vec.get(), &cursorHistoryKey);
-        tmpHistoryKey->~HistoryKey(); // only needed for non-POD
     } else {
         // need to set the LM state
         if (adjust_end < end) { // the LMstate of this target phrase refers to the last m_lmtb_size-1 words
@@ -378,8 +367,6 @@ void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
             // the relevant words for the state contain the StartSentenceSymbol
             SetWordVector(hypo, ngram_vec, 0, 0, adjust_begin, end);
 
-            if (cursorHistoryKey)
-                cursorHistoryKey->~HistoryKey(); // only needed for non-POD
             cursorHistoryKey = lm->MakeHistoryKey(ngram_vec, cursorHistoryKey);
         }
     }

@@ -229,14 +229,6 @@ public:
   void destroy(pointer p)
   {
     //std::cerr << "destroy " << p << " " << n << std::endl;
-
-    // TODO: avoid putting non-POD data into state (in MMTInterpolatedLM), then remove this destructor call
-    // TODO: measure time impact of calling the destructor here
-    // TODO:
-    // TODO: see MMTInterpolatedLM::BlankState() in MMTInterpolatedLM.cpp
-    // TODO:
-    // TODO: -- David <git@abanbytes.eu>
-    p->~T();
   }
 
   // return address of values
