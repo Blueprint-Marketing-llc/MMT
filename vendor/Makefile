@@ -32,7 +32,7 @@ __res_init:
 #  MODULE: Moses decoder
 # ==========================================
 
-MOSES_HOME		:= $(VENDOR_DIR)/moses
+MOSES_HOME              := $(MMT_HOME)/src/moses-decoder/native/moses2
 MOSES_BUILD_DIR	:= $(MOSES_HOME)/build
 	
 __moses_install: __moses

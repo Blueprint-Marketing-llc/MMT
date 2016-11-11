@@ -444,6 +444,9 @@ if (USE_SAPT)
     target_link_libraries(moses2 ${SAPT_LIBRARIES})
 endif (USE_SAPT)
 
+# currently just a dummy so  $ make install  runs:
+install(FILES mmt/MosesDecoder.h DESTINATION include)
+
 
 
 add_executable(test-moses2 ${SOURCE_FILES} mmt/test_mosesdecoder.cpp)
