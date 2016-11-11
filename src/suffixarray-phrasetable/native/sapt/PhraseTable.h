@@ -48,6 +48,8 @@ namespace mmt {
 
             virtual unordered_map<stream_t, seqid_t> GetLatestUpdatesIdentifier() override;
 
+            void ResetCounters() const;
+
         private:
             struct pt_private;
             pt_private *self;

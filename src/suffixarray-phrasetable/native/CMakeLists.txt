@@ -46,7 +46,9 @@ set(SOURCE_FILES
         util/ioutils.h
         util/chrono.h
         util/randutils.h util/randutils.cpp
-        util/BilingualCorpus.cpp util/BilingualCorpus.h)
+        util/BilingualCorpus.cpp util/BilingualCorpus.h
+        util/Timer.cpp util/Timer.h
+        util/usage.cc util/usage.hh)
 
 include_directories(${CMAKE_SOURCE_DIR})
 

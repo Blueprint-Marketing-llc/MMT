@@ -14,6 +14,12 @@
 using namespace mmt;
 using namespace mmt::sapt;
 
+#include "util/Timer.h"
+Timer GetAllTranslationOptions_timer;
+Timer MakeTranslationOptions_timer;
+Timer CollectorExtend_timer;
+
+
 struct PhraseTable::pt_private {
     SuffixArray *index;
     UpdateManager *updates;
@@ -173,6 +179,7 @@ vector<TranslationOption> PhraseTable::GetTranslationOptions(const vector<wid_t>
 }
 
 translation_table_t PhraseTable::GetAllTranslationOptions(const vector<wid_t> &sentence, context_t *context) {
+    GetAllTranslationOptions_timer.start();
     translation_table_t ttable;
 
     for (size_t start = 0; start < sentence.size(); ++start) {
@@ -188,20 +195,34 @@ translation_table_t PhraseTable::GetAllTranslationOptions(const vector<wid_t> &s
 
             if (ttable.find(phrase) == ttable.end()) {
                 vector<sample_t> samples;
+                CollectorExtend_timer.start();
                 collector->Extend(phraseDelta, self->numberOfSamples, samples);
                 phraseDelta.clear();
+                CollectorExtend_timer.stop();
 
                 if (samples.empty())
                     break;
 
                 vector<TranslationOption> options;
+                MakeTranslationOptions_timer.start();
                 MakeTranslationOptions(self->index, self->aligner, phrase, samples, options);
+                MakeTranslationOptions_timer.stop();
 
                 ttable[phrase] = options;
+                //cerr << "PhraseTable::GetAllTranslationOptions(...) CollectorExtend_timer=" << CollectorExtend_timer << " seconds total" << endl;
+                //cerr << "PhraseTable::GetAllTranslationOptions(...) MakeTranslationOptions_timer=" << MakeTranslationOptions_timer << " seconds total" << endl;
             }
         }
        delete collector;
     }
-
-    return ttable;
+    GetAllTranslationOptions_timer.stop();
+    cerr << "PhraseTable::GetAllTranslationOptions(...) global CollectorExtend_timer=" << CollectorExtend_timer << " seconds total" << endl;
+    cerr << "PhraseTable::GetAllTranslationOptions(...) global MakeTranslationOptions_timer=" << MakeTranslationOptions_timer << " seconds total" << endl;
+    cerr << "PhraseTable::GetAllTranslationOptions(...) GetAllTranslationOptions_timer=" << GetAllTranslationOptions_timer << " seconds total" << endl;    return ttable;
 }
+
+void PhraseTable::ResetCounters() const{
+    CollectorExtend_timer.reset();
+    MakeTranslationOptions_timer.reset();
+    GetAllTranslationOptions_timer.reset();
+};
