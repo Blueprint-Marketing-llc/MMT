@@ -79,7 +79,7 @@ ostream &operator<<(ostream &out, const ILMState &obj) {
     return out;
 }
 
-MMTInterpolatedLM::MMTInterpolatedLM(size_t startInd, const std::string &line) : StatefulFeatureFunction(startInd, line), m_nGramOrder(0), m_enableOOVFeature(false) {
+MMTInterpolatedLM::MMTInterpolatedLM(size_t startInd, const std::string &line) : StatefulFeatureFunction(startInd, line), m_nGramOrder(0), m_enableOOVFeature(false), m_factorType(0) {
     ReadParameters();
 
     VERBOSE(3, GetScoreProducerDescription()
