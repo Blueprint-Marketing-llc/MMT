@@ -61,7 +61,7 @@ namespace Moses2 {
     void PhraseTableSADB::Load(System &system) {
         //m_options = system.options;
         //SetFeaturesToApply();
-        m_pt = new mmt::sapt::PhraseTable(m_modelPath, pt_options, nullptr); // TODO: StaticData::Instance().GetAligner()
+        m_pt = new mmt::sapt::PhraseTable(m_modelPath, pt_options, system.aligner);
     }
 
     PhraseTableSADB::~PhraseTableSADB() {
