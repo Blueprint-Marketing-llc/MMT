@@ -20,21 +20,25 @@
 namespace mmt {
     namespace sapt {
         namespace {
-
 #if defined(__MACH__)
             typedef struct timeval Wall;
-
             Wall GetWall() {
                 struct timeval tv;
                 gettimeofday(&tv, NULL);
                 return tv;
             }
-
 #elif defined(_WIN32) || defined(_WIN64)
             typedef time_t Wall;
-                Wall GetWall() {
-                  return time(NULL);
-                }
+Wall GetWall() {
+  return time(NULL);
+}
+#else
+typedef struct timespec Wall;
+Wall GetWall() {
+  Wall ret;
+  clock_gettime(CLOCK_MONOTONIC, &ret);
+  return ret;
+}
 #endif
 
 // gcc possible-unused function flags
