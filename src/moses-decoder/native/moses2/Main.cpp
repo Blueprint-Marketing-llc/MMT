@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
     batch_run(params, system, pool);
   }
 
-  cerr << "Decoding took " << timer.get_elapsed_time() << endl;
+  cerr << "Decoding took " << timer.get_elapsed_time() << " seconds in total, including load time" << endl;
   //	cerr << "g_numHypos=" << g_numHypos << endl;
   cerr << "Finished" << endl;
   return EXIT_SUCCESS;

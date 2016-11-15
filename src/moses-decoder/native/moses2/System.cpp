@@ -32,6 +32,8 @@ System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *v
   params.SetParameter(cpuAffinityOffset, "cpu-affinity-offset", -1);
   params.SetParameter(cpuAffinityOffsetIncr, "cpu-affinity-increment", 1);
 
+  params.SetParameter(verbose, "verbose", (size_t) 0);
+
   const PARAM_VEC *section;
 
   // output collectors

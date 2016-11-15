@@ -59,6 +59,8 @@ public:
   int cpuAffinityOffset;
   int cpuAffinityOffsetIncr;
 
+  size_t verbose;
+
   System(const Parameter &paramsArg, mmt::Aligner *aligner = nullptr, mmt::Vocabulary *vocabulary = nullptr);
   virtual ~System();
 

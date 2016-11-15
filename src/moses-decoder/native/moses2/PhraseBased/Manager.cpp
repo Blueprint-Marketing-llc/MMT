@@ -31,6 +31,7 @@
 #include "../TranslationModel/PhraseTable.h"
 #include "../TranslationModel/UnknownWordPenalty.h"
 #include "../legacy/Range.h"
+#include "../legacy/Timer.h"
 #include "../PhraseBased/TargetPhrases.h"
 
 using namespace std;
@@ -112,6 +113,9 @@ void Manager::Init()
 
 	system.featureFunctions.InitializeForInput(*this);
 
+	Moses2::Timer timer;
+	timer.start();
+
 	// lookup with every pt
 	const std::vector<const PhraseTable*> &pts = system.mappings;
 	for (size_t i = 0; i < pts.size(); ++i) {
@@ -119,6 +123,13 @@ void Manager::Init()
 		//cerr << "Looking up from " << pt.GetName() << endl;
 		pt.Lookup(*this, m_inputPaths);
 	}
+
+	if(system.verbose) {
+		std::stringstream ss;
+		ss << "Collecting options took " << timer.get_elapsed_time() << " seconds" << endl;
+		cerr << ss.str();
+	}
+
 	//m_inputPaths.DeleteUnusedPaths();
 	CalcFutureScore();
 }
@@ -128,7 +139,17 @@ void Manager::Decode()
 	//cerr << "Start Decode " << this << endl;
 
 	Init();
+
+	Moses2::Timer timer;
+	timer.start();
+
 	m_search->Decode();
+
+	if(system.verbose) {
+		std::stringstream ss;
+		ss << "Search took " << timer.get_elapsed_time() << " seconds" << endl;
+		cerr << ss.str();
+	}
 
 	//cerr << "Finished Decode " << this << endl;
 }
