@@ -17,7 +17,13 @@ using namespace mmt::sapt;
 #include "util/Timer.h"
 Timer GetAllTranslationOptions_timer;
 Timer MakeTranslationOptions_timer;
+Timer MakeTranslationOptions2_timer;
 Timer CollectorExtend_timer;
+Timer GetRandomSamples_timer;
+Timer FreqScore_timer;
+Timer LexScore_timer;
+Timer Extract_timer;
+Timer CountOccurrences_timer;
 
 
 struct PhraseTable::pt_private {
@@ -127,24 +133,32 @@ static void MakeTranslationOptions(SuffixArray *index, Aligner *aligner,
 
     size_t validSamples = 0;
     vector<TranslationOptionBuilder> builders;
+    Extract_timer.start();
     TranslationOptionBuilder::Extract(phrase, samples, builders, validSamples);
+    Extract_timer.stop();
 
     static constexpr float confidence = 0.01;
 
     // Compute frequency-based and (possibly) lexical-based scores for all options
     // create the actual Translation option objects, setting the "best" alignment.
     size_t SampleSourceFrequency = validSamples;
+    CountOccurrences_timer.start();
     size_t GlobalSourceFrequency = index->CountOccurrences(true, phrase);
+    CountOccurrences_timer.stop();
 
     for (auto entry = builders.begin(); entry != builders.end(); ++entry) {
+        CountOccurrences_timer.start();
         size_t GlobalTargetFrequency = index->CountOccurrences(false, entry->GetPhrase());
+        CountOccurrences_timer.stop();
 
+        FreqScore_timer.start();
         float fwdScore = log(lbop(entry->GetCount(),
                                   std::max(entry->GetCount(), SampleSourceFrequency),
                                   confidence));
         float bwdScore = log(lbop(entry->GetCount(),
                                   std::max(entry->GetCount(), (size_t) round((float) SampleSourceFrequency * GlobalTargetFrequency / GlobalSourceFrequency)),
                                   confidence));
+        FreqScore_timer.stop();
 
         float fwdLexScore = 0.f;
         float bwdLexScore = 0.f;
@@ -154,8 +168,10 @@ static void MakeTranslationOptions(SuffixArray *index, Aligner *aligner,
         option.targetPhrase = entry->GetPhrase();
         option.orientations = entry->GetOrientations();
 
+        LexScore_timer.start();
         if (aligner)
             GetLexicalScores(aligner, phrase, option, fwdLexScore, bwdLexScore);
+        LexScore_timer.stop();
 
         option.scores[ForwardProbabilityScore] = fwdScore;
         option.scores[BackwardProbabilityScore] = min(0.f, bwdScore);
@@ -170,10 +186,14 @@ static void MakeTranslationOptions(SuffixArray *index, Aligner *aligner,
 
 vector<TranslationOption> PhraseTable::GetTranslationOptions(const vector<wid_t> &phrase, context_t *context) {
     vector<sample_t> samples;
+    GetRandomSamples_timer.start();
     self->index->GetRandomSamples(phrase, self->numberOfSamples, samples, context);
+    GetRandomSamples_timer.stop();
 
     vector<TranslationOption> result;
+    MakeTranslationOptions2_timer.start();
     MakeTranslationOptions(self->index, self->aligner, phrase, samples, result);
+    MakeTranslationOptions2_timer.stop();
 
     return result;
 }
@@ -216,13 +236,39 @@ translation_table_t PhraseTable::GetAllTranslationOptions(const vector<wid_t> &s
        delete collector;
     }
     GetAllTranslationOptions_timer.stop();
+
+    Collector *collector2 = self->index->NewCollector(context);
+    collector2->ResetCounter();
+    delete collector2;
+
+
     cerr << "PhraseTable::GetAllTranslationOptions(...) global CollectorExtend_timer=" << CollectorExtend_timer << " seconds total" << endl;
+
+    cerr << "PhraseTable::GetAllTranslationOptions(...) CountOccurrences_timer=" << CountOccurrences_timer << " seconds total" << endl;
+
+    const vector<wid_t> xxx = {};
+    TranslationOptionBuilder builder(xxx);
+    builder.ResetCounter();
+
+    cerr << "PhraseTable::GetAllTranslationOptions(...) Extract_timer=" << Extract_timer << " seconds total" << endl;
+    cerr << "PhraseTable::GetAllTranslationOptions(...) FreqScore_timer=" << FreqScore_timer << " seconds total" << endl;
+    cerr << "PhraseTable::GetAllTranslationOptions(...) LexScore_timer=" << LexScore_timer << " seconds total" << endl;
+
     cerr << "PhraseTable::GetAllTranslationOptions(...) global MakeTranslationOptions_timer=" << MakeTranslationOptions_timer << " seconds total" << endl;
-    cerr << "PhraseTable::GetAllTranslationOptions(...) GetAllTranslationOptions_timer=" << GetAllTranslationOptions_timer << " seconds total" << endl;    return ttable;
+
+    cerr << "PhraseTable::GetAllTranslationOptions(...) GetAllTranslationOptions_timer=" << GetAllTranslationOptions_timer << " seconds total" << endl;
+    cerr << "PhraseTable::GetAllTranslationOptions(...) GetRandomSamples_timer=" << GetRandomSamples_timer << " seconds total" << endl;
+
+    return ttable;
 }
 
 void PhraseTable::ResetCounters() const{
     CollectorExtend_timer.reset();
     MakeTranslationOptions_timer.reset();
     GetAllTranslationOptions_timer.reset();
+    GetRandomSamples_timer.reset();
+    FreqScore_timer.reset();
+    LexScore_timer.reset();
+    Extract_timer.reset();
+    CountOccurrences_timer.reset();
 };

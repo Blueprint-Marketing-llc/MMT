@@ -25,6 +25,7 @@ namespace mmt {
                                 vector<TranslationOptionBuilder> &output, size_t &validSamples);
 
             TranslationOptionBuilder(const vector<wid_t> &phrase);
+            void ResetCounter();
 
             const alignment_t &GetBestAlignment() const;
 

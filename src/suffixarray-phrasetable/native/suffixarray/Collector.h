@@ -31,9 +31,9 @@ namespace mmt {
                 return phrase;
             }
 
-            ~Collector() {
-                if (backgroundState) delete backgroundState;
-            }
+            ~Collector();
+
+            void ResetCounter();
 
         private:
             Collector(CorpusStorage *storage, rocksdb::DB *db, length_t prefixLength, const context_t *context,
