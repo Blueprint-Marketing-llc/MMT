@@ -22,7 +22,7 @@ namespace mmt {
         class AdaptiveLM : public LM, public IncrementalModel {
         public:
 
-            AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBufferSize, double updateMaxDelay);
+            AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBufferSize, size_t hugePageSize, double updateMaxDelay);
 
             /* LM */
 

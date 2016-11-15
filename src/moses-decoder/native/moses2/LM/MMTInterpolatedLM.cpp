@@ -433,6 +433,8 @@ void MMTInterpolatedLM::SetParameter(const std::string &key, const std::string &
         VERBOSE(3, "m_modelPath:" << m_modelPath << std::endl);
     } else if (key == "order") {
         m_nGramOrder = Scan<size_t>(value);
+    } else if (key == "huge-page-size") {
+      lm_options.huge_page_size = Scan<size_t>(value);
     } else if (key == "adaptivity-ratio") {
         lm_options.adaptivity_ratio = Scan<float>(value);
         VERBOSE(3, "lm_options.adaptivity_ratio:" << lm_options.adaptivity_ratio << std::endl);

@@ -43,6 +43,10 @@ namespace mmt {
             // to the user.
             double update_max_delay = 2.; // seconds
 
+            // set this to pass huge_page_size to RocksDB. See NGramStorage.
+            // see https://github.com/facebook/rocksdb/wiki/Allocating-Some-Indexes-and-Bloom-Filters-using-Huge-Page-TLB
+            size_t huge_page_size = 0;
+
             Options() {};
         };
 

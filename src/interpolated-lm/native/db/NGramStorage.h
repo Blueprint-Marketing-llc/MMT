@@ -34,7 +34,7 @@ namespace mmt {
         class NGramStorage {
         public:
 
-            NGramStorage(string path, uint8_t order, bool prepareForBulkLoad = false) throw(storage_exception);
+            NGramStorage(string path, uint8_t order, size_t hugePageSize, bool prepareForBulkLoad = false) throw(storage_exception);
 
             ~NGramStorage();
 

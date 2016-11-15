@@ -151,7 +151,7 @@ public:
     }
 };
 
-NGramStorage::NGramStorage(string basepath, uint8_t order, bool prepareForBulkLoad) throw(storage_exception) : order(
+NGramStorage::NGramStorage(string basepath, uint8_t order, size_t hugePageSize, bool prepareForBulkLoad) throw(storage_exception) : order(
         order) {
     rocksdb::Options options;
     options.create_if_missing = true;
@@ -160,14 +160,20 @@ NGramStorage::NGramStorage(string basepath, uint8_t order, bool prepareForBulkLo
     PlainTableOptions plainTableOptions;
     plainTableOptions.user_key_len = sizeof(domain_t) + sizeof(dbkey_t);
 
+    // huge pages
+    // see https://github.com/facebook/rocksdb/wiki/Allocating-Some-Indexes-and-Bloom-Filters-using-Huge-Page-TLB
+    options.memtable_huge_page_size = hugePageSize;
+    plainTableOptions.huge_page_tlb_size = hugePageSize;
+    options.memtable_factory.reset(NewHashLinkListRepFactory(50000, hugePageSize));
+
     options.prefix_extractor.reset(NewNoopTransform());
     options.table_factory.reset(NewPlainTableFactory(plainTableOptions));
-    options.memtable_factory.reset(NewHashLinkListRepFactory());
     options.allow_mmap_reads = true;
 
     options.max_open_files = -1;
     options.compaction_style = kCompactionStyleLevel;
     options.memtable_prefix_bloom_bits = 1024 * 1024 * 8;
+
 
     if (prepareForBulkLoad) {
         options.PrepareForBulkLoad();

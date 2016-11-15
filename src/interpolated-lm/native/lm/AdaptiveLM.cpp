@@ -62,8 +62,8 @@ namespace mmt {
     }
 }
 
-AdaptiveLM::AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBufferSize, double updateMaxDelay) :
-        order(order), storage(modelPath, order), updateManager(&storage, updateBufferSize, updateMaxDelay) {
+AdaptiveLM::AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBufferSize, size_t hugePageSize, double updateMaxDelay) :
+        order(order), storage(modelPath, order, hugePageSize), updateManager(&storage, updateBufferSize, updateMaxDelay) {
 }
 
 float AdaptiveLM::ComputeProbability(const wid_t word, const HistoryKey *historyKey, const context_t *context,
