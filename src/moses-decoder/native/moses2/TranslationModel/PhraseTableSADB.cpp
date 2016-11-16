@@ -91,7 +91,7 @@ namespace Moses2 {
              target_options_it != options.end(); ++target_options_it)
         {
             const vector<wid_t> &tpw = target_options_it->targetPhrase;
-            TargetPhraseImpl *tp = new TargetPhraseImpl(pool, *this, mgr.system, tpw.size());
+            TargetPhraseImpl *tp = new (pool.Allocate<TargetPhraseImpl>()) TargetPhraseImpl(pool, *this, mgr.system, tpw.size());
 
             // words
             for (size_t i = 0; i < tpw.size(); i++) {
