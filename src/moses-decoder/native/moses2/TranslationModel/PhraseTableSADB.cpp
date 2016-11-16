@@ -11,6 +11,9 @@
 #include "TranslationTask.h"
 
 #include <boost/lexical_cast.hpp>
+#include <algorithm>
+#include "FF/LexicalReordering/LRModel.h"
+#include "FF/LexicalReordering/LexicalReordering.h"
 
 #define ParseWord(w) (boost::lexical_cast<wid_t>((w)))
 
@@ -24,8 +27,63 @@ using namespace Moses;
 using namespace mmt::sapt;
 
 namespace Moses2 {
+    //used the constant of mmt::sapt to get entries of the vector cnt,
+    //used the cnstant of LRModel   for the probabilities
+    void fill_lr_vec2(LRModel::ModelType mdl, const vector<size_t> &cnt, const float total, float *v) {
+        if (mdl == LRModel::Monotonic) {
+            float denom = log(total + 2);
+            v[LRModel::M] = log(cnt[MonotonicOrientation] + 1.) - denom;
+            v[LRModel::NM] = log(total - cnt[MonotonicOrientation] + 1) - denom;
+        } else if (mdl == LRModel::LeftRight) {
+            float denom = log(total + 2);
+            v[LRModel::R] = log(cnt[MonotonicOrientation] + cnt[DiscontinuousRightOrientation] + 1.) - denom;
+            v[LRModel::L] = log(cnt[SwapOrientation] + cnt[DiscontinuousLeftOrientation] + 1.) - denom;
+        } else if (mdl == LRModel::MSD) {
+            float denom = log(total + 3);
+            v[LRModel::M] = log(cnt[MonotonicOrientation] + 1) - denom;
+            v[LRModel::S] = log(cnt[SwapOrientation] + 1) - denom;
+            v[LRModel::D] = log(cnt[DiscontinuousRightOrientation] +
+                                cnt[DiscontinuousLeftOrientation] + 1) - denom;
+        } else if (mdl == LRModel::MSLR) {
+            float denom = log(total + 4);
+            v[LRModel::M] = log(cnt[MonotonicOrientation] + 1) - denom;
+            v[LRModel::S] = log(cnt[SwapOrientation] + 1) - denom;
+            v[LRModel::DL] = log(cnt[DiscontinuousLeftOrientation] + 1) - denom;
+            v[LRModel::DR] = log(cnt[DiscontinuousRightOrientation] + 1) - denom;
+        } else
+            UTIL_THROW2("Reordering type not recognized!");
+    }
+
+    void fill_lr_vec(LRModel::Direction const &dir,
+                     LRModel::ModelType const &mdl,
+                     const vector<size_t> &dfwd,
+                     const vector<size_t> &dbwd,
+                     vector<float> &v) {
+        // how many distinct scores do we have?
+        size_t num_scores = (mdl == LRModel::MSLR ? 4 : mdl == LRModel::MSD ? 3 : 2);
+        size_t offset;
+        if (dir == LRModel::Bidirectional) {
+            offset = num_scores;
+            num_scores *= 2;
+        } else offset = 0;
+
+        v.resize(num_scores);
+
+        // determine the denominator
+        float total = 0;
+        for (size_t i = 0; i <= mmt::sapt::kTranslationOptionDistortionCount; ++i) {
+            total += dfwd[i];
+        }
+        if (dir != LRModel::Forward) { // i.e., Backward or Bidirectional
+            fill_lr_vec2(mdl, dbwd, total, &v[0]);
+        }
+        if (dir != LRModel::Backward) { // i.e., Forward or Bidirectional
+            fill_lr_vec2(mdl, dfwd, total, &v[offset]);
+        }
+    }
+
     PhraseTableSADB::PhraseTableSADB(size_t startInd, const std::string &line)
-            : Moses2::PhraseTable(startInd, line) {
+            : Moses2::PhraseTable(startInd, line), m_lr_func(nullptr) {
         this->m_numScores = mmt::sapt::kTranslationOptionScoreCount;
         ReadParameters();
 
@@ -62,6 +120,14 @@ namespace Moses2 {
         //m_options = system.options;
         //SetFeaturesToApply();
         m_pt = new mmt::sapt::PhraseTable(m_modelPath, pt_options, system.aligner);
+
+        if (m_lr_func_name.size() && m_lr_func == NULL) {
+            const FeatureFunction *lr = system.featureFunctions.FindFeatureFunction(m_lr_func_name);
+            m_lr_func = dynamic_cast<const LexicalReordering *>(lr);
+            UTIL_THROW_IF2(lr == NULL,
+                           "FF " << m_lr_func_name << " does not seem to be a lexical reordering function!");
+            // todo: verify that lr_func implements a hierarchical reordering model
+        }
     }
 
     PhraseTableSADB::~PhraseTableSADB() {
@@ -109,8 +175,17 @@ namespace Moses2 {
             tp->SetAlignTerm(aln);
 
             // scores
-            Scores &scores = tp->GetScores();
-            scores.Assign(mgr.system, *this, target_options_it->scores);
+            tp->GetScores().Assign(mgr.system, *this, target_options_it->scores);
+
+            vector<float> scoresExtra;
+            Moses2::fill_lr_vec(m_lr_func->GetModel().GetDirection(),
+                                m_lr_func->GetModel().GetModelType(),
+                                target_options_it->orientations.forward,
+                                target_options_it->orientations.backward,
+                                scoresExtra);
+            tp->scoreProperties = pool.Allocate<SCORE>(scoresExtra.size());
+            std::copy(scoresExtra.begin(), scoresExtra.end(), tp->scoreProperties);
+            // property-index=0 must be in moses.ini property line for LR model
 
             mgr.system.featureFunctions.EvaluateInIsolation(pool, mgr.system, sourcePhrase, *tp);
 
@@ -178,13 +253,13 @@ namespace Moses2 {
         const weightmap_t *weights = &mgr.task.GetContextWeights();
 
         if (weights) {
-          context_t *context_vec = new context_t;
+            context_t *context_vec = new context_t;
 
-          for (weightmap_t::const_iterator it = weights->begin(); it != weights->end(); ++it) {
-            context_vec->push_back(cscore_t(ParseWord(it->first), it->second));
-          }
+            for (weightmap_t::const_iterator it = weights->begin(); it != weights->end(); ++it) {
+                context_vec->push_back(cscore_t(ParseWord(it->first), it->second));
+            }
 
-          t_context_vec.reset(context_vec);
+            t_context_vec.reset(context_vec);
         }
     }
 

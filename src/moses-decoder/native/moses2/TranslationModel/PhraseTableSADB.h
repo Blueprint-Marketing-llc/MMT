@@ -29,7 +29,7 @@ namespace Moses2 {
     class ChartCellCollectionBase;
     class ChartRuleLookupManager;
     class TargetPhrases;
-
+    class LexicalReordering;
 
     class PhraseTableSADB : public Moses2::PhraseTable {
         friend std::ostream &operator<<(std::ostream &, const PhraseTableSADB &);
@@ -96,6 +96,9 @@ namespace Moses2 {
         mmt::sapt::PhraseTable *m_pt;
         string m_modelPath;
         mmt::sapt::Options pt_options;
+
+        const LexicalReordering* m_lr_func; // associated lexical reordering function
+        std::string m_lr_func_name; // name of associated lexical reordering function
 
         inline vector<wid_t> ParsePhrase(const SubPhrase<Moses2::Word> &subPhrase) const;
 

@@ -110,6 +110,9 @@ protected:
   Coll *m_coll;
 
   const Values *GetValues(const Phrase<Moses2::Word> &source, const Phrase<Moses2::Word> &target) const;
+
+public:
+  LRModel const& GetModel() const { return *m_configuration; }
 };
 
 } /* namespace Moses2 */
