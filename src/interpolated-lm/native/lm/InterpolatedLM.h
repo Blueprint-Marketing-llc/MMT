@@ -25,6 +25,8 @@ namespace mmt {
 
             ~InterpolatedLM();
 
+            void ResetCounters() const override;
+
             /* LM */
 
             inline virtual float ComputeProbability(const wid_t word, const HistoryKey *historyKey,

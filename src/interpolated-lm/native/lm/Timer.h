@@ -1,12 +1,12 @@
-#ifndef SAPT_TIMER_H
-#define SAPT_TIMER_H
+#ifndef ILM_TIMER_H
+#define ILM_TIMER_H
 
 #include <ctime>
 #include <iostream>
 #include <iomanip>
 
 namespace mmt {
-    namespace sapt {
+    namespace ilm {
 
 // A couple of utilities to measure decoding time
 

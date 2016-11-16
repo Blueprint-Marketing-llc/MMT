@@ -1,12 +1,12 @@
 #include <iostream>
 #include <iomanip>
-#include "util/usage.hh"
+#include "usage.hh"
 #include "Timer.h"
 
 using namespace std;
 
 namespace mmt {
-    namespace sapt {
+    namespace ilm {
 
 //global variable
         Timer g_timer;
@@ -34,7 +34,7 @@ namespace mmt {
             return stop_time - start_time;
           }
           if (running) {
-            return mmt::sapt::WallTime() - start_time;
+            return mmt::ilm::WallTime() - start_time;
           }
           return 0;
         }
@@ -66,10 +66,10 @@ namespace mmt {
 
           // If stopped, recompute start time
           if (stopped) {
-            start_time = mmt::sapt::WallTime() - (stop_time - start_time);
+            start_time = mmt::ilm::WallTime() - (stop_time - start_time);
             stopped = false;
           } else {
-            start_time = mmt::sapt::WallTime();
+            start_time = mmt::ilm::WallTime();
             running = true;
           }
         }
@@ -86,7 +86,7 @@ namespace mmt {
           if (stopped || !running) return;
 
           // Record stopped time
-          stop_time = mmt::sapt::WallTime();
+          stop_time = mmt::ilm::WallTime();
 
           // Change timer status to running
           stopped = true;

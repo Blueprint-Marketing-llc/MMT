@@ -18,6 +18,8 @@ namespace mmt {
 
             ~StaticLM();
 
+            virtual void ResetCounters() const override;
+
             virtual float ComputeProbability(const wid_t word, const HistoryKey *historyKey,
                                              const context_t *context, HistoryKey **outHistoryKey) const override;
 

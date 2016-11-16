@@ -3,8 +3,12 @@
 //
 
 #include "StaticLM.h"
-
 using namespace mmt::ilm;
+
+
+#include "Timer.h"
+Timer SLM_ComputeProbability_timer;
+
 
 namespace mmt {
     namespace ilm {
@@ -74,6 +78,7 @@ bool StaticLM::IsOOV(const context_t *context, const wid_t word) const {
 
 float StaticLM::ComputeProbability(const wid_t word, const HistoryKey *historyKey, const context_t *context,
                                    HistoryKey **outHistoryKey) const {
+    SLM_ComputeProbability_timer.start();
     // get the input state
     const KenLMHistoryKey *inKey = static_cast<const KenLMHistoryKey *> (historyKey);
     assert(inKey != NULL);
@@ -89,5 +94,11 @@ float StaticLM::ComputeProbability(const wid_t word, const HistoryKey *historyKe
     if (outHistoryKey)
         *outHistoryKey = new KenLMHistoryKey(word == kVocabularyEndSymbol ? model->NullContextState() : state);
 
+    SLM_ComputeProbability_timer.stop();
     return prob * 2.30258509299405f; // log10 to natural log
 }
+
+void StaticLM::ResetCounters() const{
+    cerr << "StaticLM::ResetCounter() SLM_ComputeProbability timer=" << SLM_ComputeProbability_timer << " seconds" << endl;
+};
+

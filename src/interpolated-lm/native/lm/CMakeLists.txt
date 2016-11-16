@@ -13,7 +13,9 @@ set(LM_SOURCE
         BufferedUpdateManager.cpp BufferedUpdateManager.h
         StaticLM.cpp StaticLM.h
         CachedLM.cpp CachedLM.h
-)
+        Timer.cpp Timer.h
+        usage.cc usage.hh)
+
 
 
 # Group these objects together for later use.

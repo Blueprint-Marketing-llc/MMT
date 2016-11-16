@@ -24,6 +24,8 @@ namespace mmt {
 
             AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBufferSize, double updateMaxDelay);
 
+            void ResetCounters() const override;
+
             /* LM */
 
             inline virtual float ComputeProbability(const wid_t word, const HistoryKey *historyKey,

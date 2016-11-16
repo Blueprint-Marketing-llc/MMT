@@ -13,7 +13,7 @@ using namespace mmt::sapt;
 #include "util/Timer.h"
 Timer Extract2_timer;
 Timer ExtractOptions_timer;
-Timer GetOrientation_timer;
+/*Timer GetOrientation_timer;
 Timer allAlignment_timer;
 Timer shiftedAlignment_timer;
 Timer other1_timer;
@@ -25,11 +25,13 @@ Timer other6_timer;
 Timer other7_timer;
 Timer other8_timer;
 Timer other9_timer;
+Timer other10_timer;
 
 size_t other6_calls = 0;
 size_t other7_calls = 0;
 size_t other8_calls = 0;
 size_t other9_calls = 0;
+size_t other10_calls = 0;*/
 
 // returns lowerBound <= var <= upperBound
 #define InRange(lowerBound, var, upperBound) (lowerBound <= var && var <= upperBound)
@@ -210,9 +212,10 @@ void TranslationOptionBuilder::ExtractOptions(const vector<wid_t> &sourceSentenc
                                               const vector<bool> &targetAligned,
                                               int sourceStart, int sourceEnd, int targetStart, int targetEnd,
                                               optionsmap_t &map, bool &isValidOption) {
-
-    other8_timer.start();
-    ++other8_calls;
+    int targetSentenceSize = (int) targetSentence.size();
+    //other9_timer.start();
+    //cerr << "TranslationOptionBuilder::ExtractOptions OTHER9 STR" << endl;
+    //++other9_calls;
     //cerr << "TranslationOptionBuilder::ExtractOptions() other8_calls=" << other8_calls << " sourceStart=" << sourceStart << " sourceEnd=" << sourceEnd <<" targetStart=" << targetStart <<" targetEnd=" << targetEnd << endl;
     //cerr << "source:" << sourceSentence.size() << " |"; for (size_t i=0;i<sourceSentence.size();++i) { cerr << sourceSentence[i] << " ";} ;cerr << "|" << endl;
     //cerr << "target:" << targetSentence.size() << " |"; for (size_t i=0;i<targetSentence.size();++i) { cerr << targetSentence[i] << " ";} ;cerr << "|" << endl;
@@ -220,14 +223,17 @@ void TranslationOptionBuilder::ExtractOptions(const vector<wid_t> &sourceSentenc
     //cerr << "inBoundAlignment:" << inBoundAlignment.size() << " |"; for (size_t i=0;i<inBoundAlignment.size();++i) { cerr << inBoundAlignment[i].first << "-" << inBoundAlignment[i].second << " ";} ;cerr << "|" << endl;
     //cerr << "targetAligned:" << targetAligned.size() << " |"; for (size_t i=0;i<targetAligned.size();++i) { cerr << targetAligned[i] << " ";} ;cerr << "|" << endl;
     int ts = targetStart;
-    while (true) {
-        ++other7_calls;
+    bool res_source = true;
+    while (res_source) {
+        //other7_timer.start();
+        //++other7_calls;
         int te = targetEnd;
-        //cerr << "TranslationOptionBuilder::ExtractOptions() STR other7_calls=" << other7_calls << " ts=" << ts << " te=" << te << endl;
-        other7_timer.start();
-        while (true) {
-            other6_timer.start();
-            ++other6_calls;
+
+        bool res_target = true;
+        while (res_target) {
+            //other6_timer.start();
+
+            //++other6_calls;
             //cerr << "TranslationOptionBuilder::ExtractOptions() other6_calls=" << other6_calls << endl;
 
             //other1_timer.start();
@@ -316,38 +322,39 @@ void TranslationOptionBuilder::ExtractOptions(const vector<wid_t> &sourceSentenc
             isValidOption = true;
             //other4_timer.stop();
 
+            //other6_timer.stop();
+
+            //other10_timer.start();
+            //++other10_calls;
+
             te += 1;
             // if fe is in word alignment or out-of-bounds
-            if (te == (int) targetSentence.size() || targetAligned[te]) {
-                other6_timer.stop();
-                break;
+
+            if (te == targetSentenceSize || targetAligned[te]) {
+                //if (te == (int) targetSentence.size() || targetAligned[te]) {
+                //break;
+                res_target = false;
             }
-
-            other6_timer.stop();
-
+            //other6_timer.stop();
+            //other10_timer.stop();
         }
-        other7_timer.stop();
+        //other7_timer.stop();
 
 
-        other9_timer.start();
-        ++other9_calls;
-        //cerr << "TranslationOptionBuilder::ExtractOptions() MID other7_calls=" << other7_calls << " ts=" << ts << " te=" << te << endl;
+        //other8_timer.start();
+        //++other8_calls;
         ts -= 1;
         // if fs is in word alignment or out-of-bounds
         if (ts < 0 || targetAligned[ts]) {
-            other9_timer.stop();
-            //other7_timer.stop();
-
-            //cerr << "TranslationOptionBuilder::ExtractOptions() BRK other7_calls=" << other7_calls << " ts=" << ts << " te=" << te << endl;
-            break;
+            //break;
+            res_source = false;
         }
-        other9_timer.stop();
+        //other8_timer.stop();
 
-
-        //cerr << "TranslationOptionBuilder::ExtractOptions() END other7_calls=" << other7_calls << " ts=" << ts << " te=" << te << endl;
         //other7_timer.stop();
     }
-    other8_timer.stop();
+    //cerr << "TranslationOptionBuilder::ExtractOptions OTHER9 END" << endl;
+    //other9_timer.stop();
 
 }
 
@@ -458,24 +465,27 @@ void TranslationOptionBuilder::Extract(const vector<wid_t> &sourcePhrase, const 
 }
 
 void TranslationOptionBuilder::ResetCounter(){
-    cerr << "TranslationOptionBuilder::ResetCounter() shiftedAlignment_timer=" << shiftedAlignment_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() allAlignment_timer=" << allAlignment_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() GetOrientation_timer=" << GetOrientation_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other1_timer=" << other1_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other2_timer=" << other2_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other3_timer=" << other3_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other4_timer=" << other4_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other5_timer=" << other5_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other6_calls=" << other6_calls << " other6_timer=" << other6_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other7_calls=" << other7_calls << " other7_timer=" << other7_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other8_calls=" << other8_calls << " other8_timer=" << other8_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() other9_calls=" << other9_calls << " other9_timer=" << other9_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() ExtractOptions_timer=" << ExtractOptions_timer << " seconds total" << endl;
-    cerr << "TranslationOptionBuilder::ResetCounter() Extract2_timer=" << Extract2_timer << " seconds total" << endl;
+/*
+    cerr << "TranslationOptionBuilder::ResetCounter() shiftedAlignment_timer=" << shiftedAlignment_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() allAlignment_timer=" << allAlignment_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() GetOrientation_timer=" << GetOrientation_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other1_timer=" << other1_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other2_timer=" << other2_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other3_timer=" << other3_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other4_timer=" << other4_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other5_timer=" << other5_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other6_calls=" << other6_calls << " other6_timer=" << other6_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other10_calls=" << other10_calls << " other10_timer=" << other10_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other7_calls=" << other7_calls << " other7_timer=" << other7_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other8_calls=" << other8_calls << " other8_timer=" << other8_timer << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() other9_calls=" << other9_calls << " other9_timer=" << other9_timer << endl;
+    */
+    cerr << "TranslationOptionBuilder::ResetCounter() ExtractOptions timer=" << ExtractOptions_timer << " seconds" << endl;
+    cerr << "TranslationOptionBuilder::ResetCounter() Extract2 timer=" << Extract2_timer << " seconds" << endl;
 
     Extract2_timer.reset();
     ExtractOptions_timer.reset();
-    GetOrientation_timer.reset();
+    /*GetOrientation_timer.reset();
     allAlignment_timer.reset();
     shiftedAlignment_timer.reset();
     other1_timer.reset();
@@ -487,8 +497,10 @@ void TranslationOptionBuilder::ResetCounter(){
     other7_timer.reset();
     other8_timer.reset();
     other9_timer.reset();
+    other10_timer.reset();
     other6_calls=0;
     other7_calls=0;
     other8_calls=0;
     other9_calls=0;
+    other10_calls=0;*/
 }

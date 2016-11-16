@@ -13,6 +13,15 @@ using namespace mmt::ilm;
 static const float kUnigramEpsilon = 1.f;
 static const size_t kDictionaryUpperBound = 10000000;
 
+#include "Timer.h"
+Timer ALM_ComputeProbability_timer;
+Timer ALM_ComputeNgramProbability_timer;
+Timer ALM_ComputeUnigramProbability_timer;
+Timer ALM_Caching_timer;
+
+size_t HitCounts = 0;
+size_t NoHitCounts = 0;
+
 namespace mmt {
     namespace ilm {
         struct AdaptiveLMHistoryKey : public HistoryKey {
@@ -66,6 +75,7 @@ AdaptiveLM::AdaptiveLM(const string &modelPath, uint8_t order, size_t updateBuff
 
 float AdaptiveLM::ComputeProbability(const wid_t word, const HistoryKey *historyKey, const context_t *context,
                                      HistoryKey **outHistoryKey, AdaptiveLMCache *cache) const {
+    ALM_ComputeProbability_timer.start();
     if (context == nullptr || context->empty()) {
         if (outHistoryKey)
             *outHistoryKey = new AdaptiveLMHistoryKey();
@@ -81,11 +91,13 @@ float AdaptiveLM::ComputeProbability(const wid_t word, const HistoryKey *history
     if (outHistoryKey)
         *outHistoryKey = new AdaptiveLMHistoryKey(inKey->words, word, word == kVocabularyEndSymbol ? 0 : result.length);
 
+    ALM_ComputeProbability_timer.stop();
     return result.probability > 0. ? log(result.probability) : kNaturalLogZeroProbability;
 }
 
 cachevalue_t AdaptiveLM::ComputeProbability(const context_t *context, const vector<wid_t> &history, const wid_t word,
                                             const size_t start, const size_t end, AdaptiveLMCache *cache) const {
+
     dbkey_t historyKey;
     dbkey_t ngramKey;
 
@@ -98,13 +110,17 @@ cachevalue_t AdaptiveLM::ComputeProbability(const context_t *context, const vect
     }
 
     cachevalue_t result;
-
+    ALM_Caching_timer.start();
     bool isCachable = cache && cache->IsCacheable(end - start + 1);
     bool cacheHit = isCachable && cache->Get(ngramKey, &result);
+    ALM_Caching_timer.stop();
 
     if (!cacheHit) {
+        ++NoHitCounts;
         if (start == end) { // compute the probability of the unigram; the most recent word exists for sure
+            ALM_ComputeUnigramProbability_timer.start();
             result = ComputeUnigramProbability(context, ngramKey);
+            ALM_ComputeUnigramProbability_timer.stop();
         } else { //compute recursively the probability of the n-gram (n > 1)
             float interpolatedFstar = 0.f;
             float interpolatedLambda = 0.f;
@@ -133,8 +149,9 @@ cachevalue_t AdaptiveLM::ComputeProbability(const context_t *context, const vect
                 interpolatedLambda += it->score * lambda;
                 maxLength = max(maxLength, (uint8_t) length);
             }
-
+            ALM_ComputeNgramProbability_timer.start();
             cachevalue_t loResult = ComputeProbability(context, history, word, start + 1, end, cache);
+            ALM_ComputeNgramProbability_timer.stop();
 
             result.probability = interpolatedFstar + interpolatedLambda * loResult.probability;
             result.length = max(maxLength, loResult.length);
@@ -142,6 +159,8 @@ cachevalue_t AdaptiveLM::ComputeProbability(const context_t *context, const vect
 
         if (isCachable)
             cache->Put(ngramKey, result);
+    } else{
+        ++HitCounts;
     }
 
     return result;
@@ -284,3 +303,13 @@ void AdaptiveLM::NormalizeContext(context_t *context) {
     //todo: check if the following insert is correct
     context->insert(context->begin(), ret.begin(), ret.end());
 }
+
+void AdaptiveLM::ResetCounters() const{
+    cerr << "AdaptiveLM::ResetCounter() ALM_Caching timer=" << ALM_Caching_timer << " seconds" << endl;
+    cerr << "AdaptiveLM::ResetCounter() ALM_ComputeProbability timer=" << ALM_ComputeProbability_timer << " seconds" << endl;
+    cerr << "AdaptiveLM::ResetCounter() ALM_ComputeNgramProbability timer=" << ALM_ComputeNgramProbability_timer << " seconds" << endl;
+    cerr << "AdaptiveLM::ResetCounter() ALM_ComputeUnigramProbability timer=" << ALM_ComputeUnigramProbability_timer << " seconds" << endl;
+    cerr << "AdaptiveLM::ResetCounter() NoHitCounts=" << NoHitCounts << " HitCounts=" << HitCounts << " seconds" << endl;
+    HitCounts=0;
+    NoHitCounts=0;
+};

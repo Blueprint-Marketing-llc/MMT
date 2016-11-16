@@ -211,3 +211,9 @@ void InterpolatedLM::NormalizeContext(context_t *context) {
     if (self->is_alm_active)
         self->alm->NormalizeContext(context);
 }
+
+
+void InterpolatedLM::ResetCounters() const{
+    self->slm->ResetCounters();
+    self->alm->ResetCounters();
+};

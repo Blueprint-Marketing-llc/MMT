@@ -1,12 +1,12 @@
-#ifndef SAPT_USAGE_H
-#define SAPT_USAGE_H
+#ifndef ILM_USAGE_H
+#define ILM_USAGE_H
 #include <cstddef>
 #include <iosfwd>
 #include <string>
 #include <stdint.h>
 
 namespace mmt {
-    namespace sapt {
+    namespace ilm {
 // Time in seconds since process started.  Zero on unsupported platforms.
         double WallTime();
 

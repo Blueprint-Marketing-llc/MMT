@@ -40,6 +40,8 @@ namespace mmt {
             virtual HistoryKey *MakeEmptyHistoryKey() const = 0;
 
             virtual bool IsOOV(const context_t *context, const wid_t word) const = 0;
+
+            virtual void ResetCounters() const = 0;
         };
 
     }

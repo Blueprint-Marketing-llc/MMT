@@ -41,10 +41,10 @@ Collector::~Collector(){
 }
 
 void Collector::ResetCounter(){
-    cerr << "Collector::ResetCounter() Retrieve_timer=" << Retrieve_timer << " seconds total" << endl;
-    cerr << "Collector::ResetCounter() GetLocations_timer=" << GetLocations_timer << " seconds total" << endl;
-    cerr << "Collector::ResetCounter() Sort_timer=" << Sort_timer << " seconds total" << endl;
-    cerr << "Collector::ResetCounter() CollectLocations_timer=" << CollectLocations_timer << " seconds total" << endl;
+    cerr << "Collector::ResetCounter() Retrieve timer=" << Retrieve_timer << " seconds" << endl;
+    cerr << "Collector::ResetCounter() GetLocations timer=" << GetLocations_timer << " seconds" << endl;
+    cerr << "Collector::ResetCounter() Sort timer=" << Sort_timer << " seconds" << endl;
+    cerr << "Collector::ResetCounter() CollectLocations timer=" << CollectLocations_timer << " seconds" << endl;
     Retrieve_timer.reset();
     GetLocations_timer.reset();
     CollectLocations_timer.reset();
