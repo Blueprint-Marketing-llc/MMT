@@ -206,6 +206,8 @@ namespace Moses2 {
         } else if (key == "sample-limit") {
             pt_options.samples = Scan<int>(value);
             VERBOSE(3, "pt_options.sample:" << pt_options.samples << std::endl);
+        } else if(key == "lr-func") {
+            m_lr_func_name = Scan<std::string>(value);
         } else {
             PhraseTable::SetParameter(key, value);
         }
@@ -302,8 +304,6 @@ namespace Moses2 {
     {
         UTIL_THROW2("Not implemented");
     }
-
-
 
     //TO_STRING_BODY(PhraseTableSADB);
 
