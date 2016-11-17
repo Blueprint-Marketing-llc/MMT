@@ -78,7 +78,7 @@ class LexicalReordering(MosesFeature):
         MosesFeature.__init__(self, 'LexicalReordering')
 
     def get_iniline(self):
-        return 'input-factor=0 output-factor=0 type=hier-mslr-bidirectional-fe-allff'
+        return 'input-factor=0 output-factor=0 type=hier-mslr-bidirectional-fe-allff num-features=8 property-index=0'
 
 
 class SuffixArraysPhraseTable(MosesFeature):
