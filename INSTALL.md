@@ -1,15 +1,19 @@
 # HW Requirements
 
-**Storage**: at least 10 times the corpus size, min 10GB. If your unzipped training data is 10GB, make sure you have at least 100GB on drive.
+### Storage
+At least 10 times the corpus size, min 10GB. If your unzipped training data is 10GB, make sure you have at least 100GB on drive.
 
+### Platform
+A x86_64 platform is required.
 
-**CPU**: No minimum required. 
-  - More cores generally will give you a faster training and translation request throughput. 
-  - More clock speed will generally give you a faster translation for the single request.
+### CPU
+No minimum required. 
+* More cores generally will give you a faster training and translation request throughput. 
+* More clock speed will generally give you a faster translation for the single request.
 
-**Memory**: 
-  - Min 5GB
-  - 1GB each 350MB of training data
+### Memory
+*  Min 5GB
+*  1GB each 350MB of training data
 
 # Support
 
@@ -17,7 +21,21 @@ You can report issues on [GitHub](https://github.com/ModernMT/MMT/issues)
 
 For customizations and enterprise support: davide.caroselli@translated.net
 
-# Setup up the server
+# Option 1 - Using Docker
+
+```
+docker pull modernmt/master
+```
+
+To run your istance and publish the API on port 8045 of your host, execute
+
+```
+docker run -it --publish 8045:8045 modernmt/master bash
+```
+
+Done! go to [README.md](README.md) to create your first engine.
+
+# Option 2 - Install Binaries on Your Server
 
 **MMT currently only works on Ubuntu 14.04**
 
@@ -26,6 +44,15 @@ AMI: Ubuntu Server 14.04 LTS (HVM), SSD Volume Type -  ami-accff2b1
 
 For training >100M words we suggest to use this instance: 
 c3.4xlarge (30GB RAM, 16 core, circa $0.90/hour)
+
+## Max open files limit
+The current version of ModernMT does not limit the maximum number of open files for performance reasons. For this reason, if you plan to create an engine with a high number of different domains you could hit the OS limit and MMT will crash.
+
+In order to avoid this error, in Ubuntu 14.04, you have to set the option `nofile` in `/etc/security/limits.conf` to a high limit and restart the machine, for example:
+```
+soft nofile 1048576
+hard nofile 1048576
+```
 
 ## Libraries that MMT requires:
 
@@ -70,20 +97,19 @@ sudo pip install -U requests
 ```
 
 
-# Install the MMT Binaries
+## Install the MMT Binaries
 
 Download from here: https://github.com/ModernMT/MMT/releases and then untar the files:
 
 ```
-tar xvfz mmt-0.13-ubuntu14_04.tar.gz
+tar xvfz mmt-0.14_alpha-ubuntu14_04.tar.gz
 cd mmt
+./setup.py
 ```
 
 Done! go to [README.md](README.md)
 
-
-
-# Installing from source (for contributors)
+# Option 3 - Installing from source (for contributors)
 
 Build MMT from source allows you to contribute to this repository. Please note that currently this procedure has been tested only on Ubuntu 14.04, it is highly recommended to use this OS as your development environment.
 
@@ -121,11 +147,18 @@ make
 cd ..
 ```
 
-Finally compile your MMT distribution:
+Compile your MMT distribution:
 
 ```
 cd src
 mvn clean install
+cd ..
+```
+
+Finally run the setup:
+
+```
+./setup.py
 ```
 
 You have now a working instance of MMT. Go to [README.md](README.md) to find how to test your installation.

@@ -7,10 +7,6 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-#if USING_FASTALIGN
-#include <fastalign/FastAligner.h>
-#endif
-
 using namespace std;
 using namespace mmt;
 using namespace mmt::sapt;
@@ -22,7 +18,6 @@ namespace {
 
     struct args_t {
         string model_path;
-        string aligner_model_path;
         context_t context;
         size_t sample_limit = 1000;
         bool quiet = false;
@@ -57,9 +52,9 @@ bool ParseArgs(int argc, const char *argv[], args_t *args) {
             ("help,h", "print this help message")
             ("model,m", po::value<string>()->required(), "output model path")
             ("context,c", po::value<string>(), "context map in the format <id>:<w>[,<id>:<w>]")
-            ("aligner-model,a", po::value<string>(), "path to aligner model")
             ("sample,s", po::value<size_t>(), "number of samples (default is 100)")
             ("quiet,q", "prints only number of match");
+
 
     po::variables_map vm;
     try {
@@ -68,11 +63,6 @@ bool ParseArgs(int argc, const char *argv[], args_t *args) {
         if (vm.count("help")) {
             cout << desc << endl;
             return false;
-        }
-
-
-        if (vm.count("alignerModel")) {
-            args->aligner_model_path = vm["alignerModel"].as<string>();
         }
 
         if (vm.count("context")) {
@@ -123,16 +113,7 @@ int main(int argc, const char *argv[]) {
     Options ptOptions;
     ptOptions.samples = args.sample_limit;
 
-    Aligner *aligner =  NULL;
-    if (args.aligner_model_path != "") {
-#if USING_FASTALIGN
-        aligner = mmt::fastalign::FastAligner::Open(args.aligner_model_path, 1);
-#else
-        // Could not find FastAlign
-#endif
-    }
-
-    PhraseTable pt(args.model_path, ptOptions, aligner);
+    SuffixArray sa(args.model_path, Options().prefix_length);
 
     if (!args.quiet) {
         cout << "Model loaded" << endl;
@@ -155,14 +136,30 @@ int main(int argc, const char *argv[]) {
             cout << endl;
         }
 
-        vector<TranslationOption> options = pt.GetTranslationOptions(sourcePhrase, context);
+        vector<sample_t> samples;
+        sa.GetRandomSamples(sourcePhrase, args.sample_limit, samples, context);
+
+        size_t NumberOfsamples = samples.size();
 
         if (!args.quiet) {
-            for (auto option = options.begin(); option != options.end(); ++option) {
-                cout << option->ToString() << endl;
+            for (size_t pos = 0; pos < NumberOfsamples; ++pos) {
+                const sample_t &sample = samples[pos];
+
+                for (auto w = sample.source.begin(); w != sample.source.end(); ++w) {
+                    cout << *w << " ";
+                }
+                cout << "||| ";
+                for (auto w = sample.target.begin(); w != sample.target.end(); ++w) {
+                    cout << *w << " ";
+                }
+                cout << "||| ";
+                for (auto a = sample.alignment.begin(); a != sample.alignment.end(); ++a) {
+                    cout << a->first << "-" << a->second << " ";
+                }
+                cout << endl;
             }
         }
-        cout << "Found " << options.size() << " options" << endl;
+        cout << "Found " << NumberOfsamples << " samples" << endl;
     }
 
     return SUCCESS;

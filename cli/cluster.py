@@ -119,8 +119,14 @@ class MMTApi:
 
         return self._get('translate', params=p)
 
-    def create_domain(self, source_file, target_file, name=None):
-        params = {'source_local_file': source_file, 'target_local_file': target_file}
+    def create_domain(self, tmx=None, source_file=None, target_file=None, name=None):
+        if source_file is not None and target_file is not None:
+            params = {'source_local_file': source_file, 'target_local_file': target_file}
+        elif tmx is not None:
+            params = {'tmx_local_file': tmx}
+        else:
+            raise IllegalArgumentException('missing corpus for domain')
+
         if name is not None:
             params['name'] = name
 
@@ -228,29 +234,32 @@ class EmbeddedKafka:
         self._log_file = self._engine.get_logfile('embedded-kafka', ensure=True)
 
         success = False
+        zpid, kpid = 0, 0
 
         log = open(self._log_file, 'w')
-        zpid = self._start_zookeeper(log).pid
-        kpid = self._start_kafka(log).pid
 
-        if zpid > 0 and kpid > 0:
+        try:
+            zpid = self._start_zookeeper(log)
+            if zpid is None:
+                raise IllegalStateException(
+                    'failed to start zookeeper, check log file for more details: ' + self._log_file)
+
+            kpid = self._start_kafka(log)
+            if kpid is None:
+                raise IllegalStateException(
+                    'failed to start kafka, check log file for more details: ' + self._log_file)
+
             self._set_pids(kpid, zpid)
 
-            for _ in range(0, 5):
-                success = self.is_running()
-                if success:
-                    break
+            success = True
+        except:
+            if not success:
+                daemon.kill(kpid)
+                daemon.kill(zpid)
+                log.close()
+            raise
 
-                time.sleep(1)
-
-        if not success:
-            daemon.kill(kpid)
-            daemon.kill(zpid)
-            log.close()
-
-            raise Exception('failed to start kafka, check log file for more details: ' + self._log_file)
-
-    def _start_zookeeper(self, log):
+    def _start_zookeeper(self, log, port=2181):
         zdata = os.path.abspath(os.path.join(self._data, 'zdata'))
         if not os.path.isdir(zdata):
             fileutils.makedirs(zdata, exist_ok=True)
@@ -258,14 +267,27 @@ class EmbeddedKafka:
         config = os.path.join(self._data, 'zookeeper.properties')
         with open(config, 'w') as cout:
             cout.write('dataDir={data}\n'.format(data=zdata))
-            cout.write('clientPort=2181\n')
+            cout.write('clientPort={port}\n'.format(port=port))
             cout.write('maxClientCnxns=0\n')
 
         command = [self._zookeeper_bin, config]
+        zookeeper = subprocess.Popen(command, stdout=log, stderr=log, shell=False).pid
 
-        return subprocess.Popen(command, stdout=log, stderr=log, shell=False)
+        for i in range(1, 5):
+            try:
+                msg = fileutils.netcat('127.0.0.1', port, 'ruok', timeout=2)
+            except:
+                msg = None
 
-    def _start_kafka(self, log):
+            if 'imok' == msg:
+                return zookeeper
+            else:
+                time.sleep(1)
+
+        daemon.kill(zookeeper)
+        return None
+
+    def _start_kafka(self, log, port=9092, zookeeper_port=2181):
         kdata = os.path.abspath(os.path.join(self._data, 'kdata'))
         if not os.path.isdir(kdata):
             fileutils.makedirs(kdata, exist_ok=True)
@@ -273,14 +295,25 @@ class EmbeddedKafka:
         config = os.path.join(self._data, 'kafka.properties')
         with open(config, 'w') as cout:
             cout.write('broker.id=0\n')
+            cout.write('listeners=PLAINTEXT://0.0.0.0:{port}\n'.format(port=port))
             cout.write('log.dirs={data}\n'.format(data=kdata))
             cout.write('num.partitions=1\n')
             cout.write('log.retention.hours=8760000\n')
-            cout.write('zookeeper.connect=localhost:2181\n')
+            cout.write('zookeeper.connect=localhost:{port}\n'.format(port=zookeeper_port))
 
         command = [self._kafka_bin, config]
+        kafka = subprocess.Popen(command, stdout=log, stderr=log, shell=False).pid
 
-        return subprocess.Popen(command, stdout=log, stderr=log, shell=False)
+        for i in range(1, 5):
+            with open(log.name, 'r') as rlog:
+                for line in rlog:
+                    if 'INFO [Kafka Server 0], started (kafka.server.KafkaServer)' in line:
+                        return kafka
+
+            time.sleep(1)
+
+        daemon.kill(kafka)
+        return None
 
 
 class ClusterNode(object):
@@ -441,7 +474,7 @@ class ClusterNode(object):
         if current == ClusterNode.STATUS['ERROR']:
             raise Exception('failed to start node, check log file for more details: ' + self._log_file)
 
-    def tune(self, corpora=None, debug=False, context_enabled=True):
+    def tune(self, corpora=None, debug=False, context_enabled=True, random_seeds=False, max_iterations=25):
         if corpora is None:
             corpora = BilingualCorpus.list(os.path.join(self.engine.data_path, TrainingPreprocessor.DEV_FOLDER_NAME))
 
@@ -507,6 +540,11 @@ class ClusterNode(object):
                                '--decoder-flags', '"' + ' '.join(decoder_flags) + '"', '--nonorm', '--closest',
                                '--no-filter-phrase-table']
 
+                    if not random_seeds:
+                        command.append('--predictable-seeds')
+                    if max_iterations > 0:
+                        command.append('--maximum-iterations={num}'.format(num=max_iterations))
+
                     with open(self.engine.get_logfile('mert'), 'wb') as log:
                         shell.execute(' '.join(command), stdout=log, stderr=log)
 
@@ -537,8 +575,11 @@ class ClusterNode(object):
             if not debug:
                 self.engine.clear_tempdir()
 
-    def new_domain(self, source_file, target_file, name=None):
-        return self.api.create_domain(source_file, target_file, name)
+    def new_domain_from_parallel(self, source_file, target_file, name=None):
+        return self.api.create_domain(source_file=source_file, target_file=target_file, name=name)
+
+    def new_domain_from_tmx(self, tmx, name=None):
+        return self.api.create_domain(tmx=tmx, name=name)
 
     def append_to_domain(self, domain, source, target):
         try:
