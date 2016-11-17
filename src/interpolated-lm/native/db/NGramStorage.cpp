@@ -90,6 +90,8 @@ static inline string SerializeCounts(counts_t counts) {
     return string(bytes, 8);
 }
 
+// ORIGINAL
+/*
 static inline string SerializeKey(domain_t domain, dbkey_t key) {
     const char bytes[12] = {
             (char) (domain & 0xFF),
@@ -105,6 +107,29 @@ static inline string SerializeKey(domain_t domain, dbkey_t key) {
             (char) ((key >> 40) & 0xFF),
             (char) ((key >> 48) & 0xFF),
             (char) ((key >> 56) & 0xFF)
+    };
+
+    return string(bytes, 12);
+}
+*/
+
+// REVISED
+static inline string SerializeKey(domain_t domain, dbkey_t key) {
+    const char bytes[12] = {
+
+            (char) (key & 0xFF),
+            (char) ((key >> 8) & 0xFF),
+            (char) ((key >> 16) & 0xFF),
+            (char) ((key >> 24) & 0xFF),
+            (char) ((key >> 32) & 0xFF),
+            (char) ((key >> 40) & 0xFF),
+            (char) ((key >> 48) & 0xFF),
+            (char) ((key >> 56) & 0xFF),
+
+            (char) (domain & 0xFF),
+            (char) ((domain >> 8) & 0xFF),
+            (char) ((domain >> 16) & 0xFF),
+            (char) ((domain >> 24) & 0xFF)
     };
 
     return string(bytes, 12);
