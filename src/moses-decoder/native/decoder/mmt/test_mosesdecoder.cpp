@@ -6,7 +6,7 @@
 #include <iostream>
 #include <thread>
 
-#include "mmt/MosesDecoder.h"
+#include <decoder/MosesDecoder.h>
 
 using namespace mmt::decoder;
 

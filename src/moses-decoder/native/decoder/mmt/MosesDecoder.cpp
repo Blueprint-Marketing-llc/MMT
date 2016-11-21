@@ -8,7 +8,7 @@
 
 #include "TranslationTask.h"
 #include "legacy/ThreadPool.h"
-#include "MosesDecoder.h"
+#include <decoder/MosesDecoder.h>
 #include "Translator.h"
 #include "legacy/Parameter.h"
 #include "System.h"

@@ -16,6 +16,7 @@ set(SOURCE_FILES
 
 include_directories(${CMAKE_SOURCE_DIR})
 #include_directories(${MMT_INCLUDE_DIR})
+include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)

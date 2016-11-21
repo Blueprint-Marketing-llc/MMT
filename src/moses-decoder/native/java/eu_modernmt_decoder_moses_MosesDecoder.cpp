@@ -3,7 +3,7 @@
 //
 
 #include <javah/eu_modernmt_decoder_moses_MosesDecoder.h>
-#include <decoder/MosesDecoder.h>
+#include "decoder/MosesDecoder.h"
 #include <stdlib.h>
 #include "JMosesFeature.h"
 #include "JTranslation.h"
