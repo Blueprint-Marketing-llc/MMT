@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <boost/pool/pool_alloc.hpp>
-#include "Main.h"
+#include "../decoder/Main.h"
 #include "System.h"
 #include "Phrase.h"
 #include "TranslationTask.h"
