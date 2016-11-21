@@ -12,11 +12,11 @@ set(Rocksdb_SEARCH_LIB_PATH
         ${ROCKSDB_ROOT}/lib $ENV{ROCKSDB_ROOT}/lib
         )
 
-find_path(Rocksdb_INCLUDE_DIR rocksdb/db.h PATHS
+find_path(Rocksdb_INCLUDE_DIR rocksdb/db.h HINTS
         ${Rocksdb_SEARCH_HEADER_PATHS}
         )
 
-find_library(Rocksdb_LIB_PATH NAMES rocksdb PATHS ${Rocksdb_SEARCH_LIB_PATH})
+find_library(Rocksdb_LIB_PATH NAMES rocksdb HINTS ${Rocksdb_SEARCH_LIB_PATH})
 
 if (Rocksdb_INCLUDE_DIR AND Rocksdb_LIB_PATH)
     set(Rocksdb_FOUND TRUE)
