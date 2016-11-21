@@ -44,6 +44,7 @@
         <project.nativedir.javah>${project.nativedir}/javah</project.nativedir.javah>
 
         <!-- MMT build directory -->
+        <mmt.root>${project.basedir}/../..</mmt.root>
         <mmt.build>${project.basedir}/../../build</mmt.build>
         <mmt.build.lib>${mmt.build}/lib</mmt.build.lib>
         <mmt.build.bin>${mmt.build}/bin</mmt.build.bin>

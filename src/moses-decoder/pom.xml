@@ -34,7 +34,7 @@
                         <fileset>
                             <directory>${mmt.build.lib}</directory>
                             <includes>
-                                <include>*jnimoses*</include>
+                                <include>*mmt-decoder*</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
@@ -83,8 +83,19 @@
                             <executable>cmake</executable>
                             <workingDirectory>${project.build.native}</workingDirectory>
                             <arguments>
-                                <argument>-DMMT_INCLUDE_DIR=${project.native.include}</argument>
+<!--                                <argument>-DMMT_INCLUDE_DIR=${project.native.include}</argument>-->
+                                <argument>-DCMAKE_BUILD_TYPE=Release</argument>
                                 <argument>-DCMAKE_INSTALL_PREFIX=${mmt.build}</argument>
+                                <argument>-Wno-dev</argument>
+
+                                <argument>-DMMT_ROOT=${mmt.root}</argument>
+                                <argument>-DMMTILM_ROOT=${mmt.build}</argument>
+                                <argument>-DSAPT_ROOT=${mmt.build}</argument>
+                                <argument>-DROCKSDB_ROOT=${mmt.build}</argument>
+
+                                <argument>-DUSE_MMTILM=1</argument>
+                                <argument>-DUSE_SAPT=1</argument>
+
                                 <argument>${project.nativedir}</argument>
                             </arguments>
                         </configuration>
@@ -133,6 +144,16 @@
         <dependency>
             <groupId>eu.modernmt</groupId>
             <artifactId>mmt-common-interfaces</artifactId>
+            <version>${mmt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.modernmt</groupId>
+            <artifactId>mmt-suffixarray-phrasetable</artifactId>
+            <version>${mmt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.modernmt</groupId>
+            <artifactId>mmt-interpolated-lm</artifactId>
             <version>${mmt.version}</version>
         </dependency>
         <dependency>

@@ -59,7 +59,7 @@ if (USE_SAPT)
 endif (USE_SAPT)
 
 
-set(SOURCE_FILES
+set(MOSES2_SOURCE_FILES
 #    defer/CubePruningBitmapStack/Misc.cpp
 #    defer/CubePruningBitmapStack/Misc.h
 #    defer/CubePruningBitmapStack/Search.cpp
@@ -428,8 +428,8 @@ set(SOURCE_FILES
     Word.cpp
     Word.h mmt/Translator.h)
 
-#add_executable(moses2 ${SOURCE_FILES} Main.cpp)
-add_library(moses2 SHARED ${SOURCE_FILES})
+#add_executable(moses2 ${MOSES2_SOURCE_FILES} Main.cpp)
+add_library(moses2 SHARED ${MOSES2_SOURCE_FILES})
 target_link_libraries(moses2 pthread)
 #target_link_libraries(moses2 ${XMLRPC_LIBRARIES})
 target_link_libraries(moses2 ${Boost_LIBRARIES})
@@ -449,7 +449,7 @@ install(FILES mmt/MosesDecoder.h DESTINATION include)
 
 
 
-add_executable(test-moses2 ${SOURCE_FILES} mmt/test_mosesdecoder.cpp)
+add_executable(test-moses2 ${MOSES2_SOURCE_FILES} mmt/test_mosesdecoder.cpp)
 target_link_libraries(test-moses2 pthread)
 #target_link_libraries(test-moses2 ${XMLRPC_LIBRARIES})
 target_link_libraries(test-moses2 ${Boost_LIBRARIES})
