@@ -71,6 +71,8 @@ if (USE_SAPT)
     include_directories(${MMTCommons_INCLUDE_DIR})
 endif (USE_SAPT)
 
+install(FILES include/decoder/MosesDecoder.h DESTINATION include)
+
 add_subdirectory(decoder)
 target_link_libraries(${PROJECT_NAME} moses2)  # TODO(david): replace with MOSES2_SOURCE_FILES / object bundle.
 

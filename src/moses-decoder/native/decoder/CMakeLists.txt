@@ -208,7 +208,6 @@ set(MOSES2_SOURCE_FILES
     LM/MMTInterpolatedLM.cpp
     LM/MMTInterpolatedLM.h
     mmt/MosesDecoder.cpp
-    mmt/MosesDecoder.h
     MorphoTrie/MorphTrie.h
     MorphoTrie/Node.h
     MorphoTrie/utils.h
@@ -443,11 +442,6 @@ endif (USE_MMTILM)
 if (USE_SAPT)
     target_link_libraries(moses2 ${SAPT_LIBRARIES})
 endif (USE_SAPT)
-
-# currently just a dummy so  $ make install  runs:
-install(FILES mmt/MosesDecoder.h DESTINATION include)
-
-
 
 add_executable(test-moses2 ${MOSES2_SOURCE_FILES} mmt/test_mosesdecoder.cpp)
 target_link_libraries(test-moses2 pthread)
