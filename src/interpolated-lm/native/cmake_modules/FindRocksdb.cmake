@@ -14,9 +14,10 @@ set(Rocksdb_SEARCH_LIB_PATH
 
 find_path(Rocksdb_INCLUDE_DIR rocksdb/db.h HINTS
         ${Rocksdb_SEARCH_HEADER_PATHS}
+        NO_DEFAULT_PATH
         )
 
-find_library(Rocksdb_LIB_PATH NAMES rocksdb HINTS ${Rocksdb_SEARCH_LIB_PATH})
+find_library(Rocksdb_LIB_PATH NAMES rocksdb HINTS ${Rocksdb_SEARCH_LIB_PATH} NO_DEFAULT_PATH)
 
 if (Rocksdb_INCLUDE_DIR AND Rocksdb_LIB_PATH)
     set(Rocksdb_FOUND TRUE)

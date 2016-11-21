@@ -48,24 +48,24 @@ find_package(ZLIB REQUIRED)
 
 ## MMT interpolated LM
 if (USE_MMTILM)
-    find_package(ROCKSDB REQUIRED)
+    find_package(Rocksdb REQUIRED)
     find_package(MMTCommons REQUIRED)
     find_package(MMTILM REQUIRED)
     add_definitions(-DLM_MMTILM=true)
 
-    include_directories(${ROCKSDB_INCLUDE_DIRS})
+    include_directories(${Rocksdb_INCLUDE_DIRS})
     include_directories(${MMTILM_INCLUDE_DIRS})
     include_directories(${MMTCommons_INCLUDE_DIR})
 endif (USE_MMTILM)
 
 ## MMT sampling phrasetable
 if (USE_SAPT)
-    find_package(ROCKSDB REQUIRED)
+    find_package(Rocksdb REQUIRED)
     find_package(SAPT REQUIRED)
     find_package(MMTCommons REQUIRED)
     add_definitions(-DSAPT=true)
 
-    include_directories(${ROCKSDB_INCLUDE_DIRS})
+    include_directories(${Rocksdb_INCLUDE_DIRS})
     include_directories(${SAPT_INCLUDE_DIRS})
     include_directories(${MMTCommons_INCLUDE_DIR})
 endif (USE_SAPT)

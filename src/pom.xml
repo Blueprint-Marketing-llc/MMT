@@ -51,7 +51,6 @@
 
         <!-- Vendor directory -->
         <mmt.vendor>${project.basedir}/../../vendor</mmt.vendor>
-        <mmt.vendor.rocksdb>${mmt.vendor}/rocksdb/</mmt.vendor.rocksdb>
     </properties>
 
     <build>
