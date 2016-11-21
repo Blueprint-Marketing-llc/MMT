@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Moses definitions
 # -DHAVE_XMLRPC_C
-add_definitions(-DMAX_NUM_FACTORS=4 -DKENLM_MAX_ORDER=6 -DWITH_THREADS)
+add_definitions(-DMAX_NUM_FACTORS=1 -DKENLM_MAX_ORDER=6 -DWITH_THREADS)
 
 include_directories(.)
 include_directories(legacy)
