@@ -12,7 +12,6 @@
 #include "PhraseBasedReorderingState.h"
 #include "BidirectionalReorderingState.h"
 #include "../../TranslationModel/PhraseTable.h"
-#include "../../TranslationModel/CompactPT/LexicalReorderingTableCompact.h"
 #include "../../System.h"
 #include "../../PhraseBased/PhraseImpl.h"
 #include "../../PhraseBased/Manager.h"
@@ -30,7 +29,7 @@ namespace Moses2
 ///////////////////////////////////////////////////////////////////////
 
 LexicalReordering::LexicalReordering(size_t startInd, const std::string &line) :
-    StatefulFeatureFunction(startInd, line), m_compactModel(NULL), m_blank(
+    StatefulFeatureFunction(startInd, line), m_blank(
         NULL), m_propertyInd(-1), m_coll(NULL), m_configuration(NULL)
 {
   ReadParameters();
@@ -40,7 +39,6 @@ LexicalReordering::LexicalReordering(size_t startInd, const std::string &line) :
 
 LexicalReordering::~LexicalReordering()
 {
-  delete m_compactModel;
   delete m_coll;
   delete m_configuration;
 }
@@ -51,11 +49,6 @@ void LexicalReordering::Load(System &system)
 
   if (m_propertyInd >= 0) {
     // Using integrate Lex RO. No loading needed
-  }
-  else if (FileExists(m_path + ".minlexr")) {
-    m_compactModel = new LexicalReorderingTableCompact(m_path + ".minlexr",
-        m_FactorsF, m_FactorsE, m_FactorsC);
-    m_blank = new (pool.Allocate<PhraseImpl>()) PhraseImpl(pool, 0);
   }
   else {
     m_coll = new Coll();
@@ -152,23 +145,6 @@ void LexicalReordering::EvaluateAfterTablePruning(MemPool &pool,
   if (m_propertyInd >= 0) {
     SCORE *scoreArr = targetPhrase.GetScoresProperty(m_propertyInd);
     targetPhrase.ffData[m_PhraseTableInd] = scoreArr;
-  }
-  else if (m_compactModel) {
-    // using external compact binary model
-    const Values values = m_compactModel->GetScore(sourcePhrase, targetPhrase,
-        *m_blank);
-    if (values.size()) {
-      assert(values.size() == m_numScores);
-
-      SCORE *scoreArr = pool.Allocate<SCORE>(m_numScores);
-      for (size_t i = 0; i < m_numScores; ++i) {
-        scoreArr[i] = values[i];
-      }
-      targetPhrase.ffData[m_PhraseTableInd] = scoreArr;
-    }
-    else {
-      targetPhrase.ffData[m_PhraseTableInd] = NULL;
-    }
   }
   else if (m_coll) {
     // using external memory model

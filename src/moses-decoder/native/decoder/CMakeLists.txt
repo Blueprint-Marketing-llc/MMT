@@ -114,10 +114,6 @@ set(MOSES2_SOURCE_FILES
     FF/PhrasePenalty.h
     FF/PointerState.cpp
     FF/PointerState.h
-    FF/SkeletonStatefulFF.cpp
-    FF/SkeletonStatefulFF.h
-    FF/SkeletonStatelessFF.cpp
-    FF/SkeletonStatelessFF.h
     FF/StatefulFeatureFunction.cpp
     FF/StatefulFeatureFunction.h
     FF/StatelessFeatureFunction.cpp
@@ -307,55 +303,11 @@ set(MOSES2_SOURCE_FILES
 #    server/TranslationRequest.h
 #    server/Translator.cpp
 #    server/Translator.h
-    TranslationModel/CompactPT/BlockHashIndex.cpp
-    TranslationModel/CompactPT/BlockHashIndex.h
-    TranslationModel/CompactPT/CanonicalHuffman.h
-    TranslationModel/CompactPT/CmphStringVectorAdapter.cpp
-    TranslationModel/CompactPT/CmphStringVectorAdapter.h
-    TranslationModel/CompactPT/LexicalReorderingTableCompact.cpp
-    TranslationModel/CompactPT/LexicalReorderingTableCompact.h
-    TranslationModel/CompactPT/ListCoders.h
-    TranslationModel/CompactPT/MmapAllocator.h
-    TranslationModel/CompactPT/MonotonicVector.h
-    TranslationModel/CompactPT/MurmurHash3.cpp
-    TranslationModel/CompactPT/MurmurHash3.h
-    TranslationModel/CompactPT/PackedArray.h
-    TranslationModel/CompactPT/PhraseDecoder.cpp
-    TranslationModel/CompactPT/PhraseDecoder.h
-    TranslationModel/CompactPT/PhraseTableCompact.cpp
-    TranslationModel/CompactPT/PhraseTableCompact.h
-    TranslationModel/CompactPT/StringVector.h
-    TranslationModel/CompactPT/TargetPhraseCollectionCache.cpp
-    TranslationModel/CompactPT/TargetPhraseCollectionCache.h
-    TranslationModel/CompactPT/ThrowingFwrite.cpp
-    TranslationModel/CompactPT/ThrowingFwrite.h
-    TranslationModel/Memory/Node.h
-    TranslationModel/Memory/PhraseTableMemory.cpp
-    TranslationModel/Memory/PhraseTableMemory.h
-    TranslationModel/ProbingPT/hash.cpp
-    TranslationModel/ProbingPT/hash.hh
-    TranslationModel/ProbingPT/line_splitter.cpp
-    TranslationModel/ProbingPT/line_splitter.hh
-    TranslationModel/ProbingPT/probing_hash_utils.cpp
-    TranslationModel/ProbingPT/probing_hash_utils.hh
-    TranslationModel/ProbingPT/ProbingPT.cpp
-    TranslationModel/ProbingPT/ProbingPT.h
-    TranslationModel/ProbingPT/querying.cpp
-    TranslationModel/ProbingPT/querying.hh
-    TranslationModel/ProbingPT/StoreTarget.cpp
-    TranslationModel/ProbingPT/StoreTarget.h
-    TranslationModel/ProbingPT/StoreVocab.cpp
-    TranslationModel/ProbingPT/StoreVocab.h
-    TranslationModel/ProbingPT/storing.cpp
-    TranslationModel/ProbingPT/storing.hh
-    TranslationModel/ProbingPT/vocabid.cpp
-    TranslationModel/ProbingPT/vocabid.hh
+
     TranslationModel/PhraseTable.cpp
     TranslationModel/PhraseTable.h
     TranslationModel/PhraseTableSADB.cpp
     TranslationModel/PhraseTableSADB.h
-    TranslationModel/Transliteration.cpp
-    TranslationModel/Transliteration.h
     TranslationModel/UnknownWordPenalty.cpp
     TranslationModel/UnknownWordPenalty.h
     AlignmentInfo.cpp

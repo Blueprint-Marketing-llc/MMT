@@ -1,10 +1,6 @@
 #include "FeatureRegistry.h"
 
-#include "../TranslationModel/Memory/PhraseTableMemory.h"
-#include "../TranslationModel/CompactPT/PhraseTableCompact.h"
-#include "../TranslationModel/ProbingPT/ProbingPT.h"
 #include "../TranslationModel/UnknownWordPenalty.h"
-#include "../TranslationModel/Transliteration.h"
 #include "../TranslationModel/PhraseTableSADB.h"
 
 #include "../LM/MMTInterpolatedLM.h"
@@ -13,9 +9,6 @@
 #include "LexicalReordering/LexicalReordering.h"
 #include "PhrasePenalty.h"
 #include "WordPenalty.h"
-
-#include "SkeletonStatefulFF.h"
-#include "SkeletonStatelessFF.h"
 
 using namespace std;
 
@@ -40,23 +33,14 @@ FeatureRegistry::FeatureRegistry()
 #define MOSES_FNAME2(name, type) Add(name, new DefaultFeatureFactory< type >());
 
   MOSES_FNAME2("SAPT", PhraseTableSADB);
-  MOSES_FNAME2("PhraseDictionaryCompact", PhraseTableCompact);
-  MOSES_FNAME2("PhraseDictionaryMemory", PhraseTableMemory);
-  MOSES_FNAME(ProbingPT);
-  MOSES_FNAME2("PhraseDictionaryTransliteration", Transliteration);
-  MOSES_FNAME(UnknownWordPenalty);
 
   MOSES_FNAME2("MMTILM", MMTInterpolatedLM);
-
-  MOSES_FNAME(LanguageModel);
 
   MOSES_FNAME(Distortion);
   MOSES_FNAME(LexicalReordering);
   MOSES_FNAME(PhrasePenalty);
   MOSES_FNAME(WordPenalty);
-
-  MOSES_FNAME(SkeletonStatefulFF);
-  MOSES_FNAME(SkeletonStatelessFF);
+  MOSES_FNAME(UnknownWordPenalty);
 }
 
 FeatureRegistry::~FeatureRegistry()

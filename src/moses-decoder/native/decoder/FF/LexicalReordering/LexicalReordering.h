@@ -16,7 +16,6 @@
 namespace Moses2
 {
 
-class LexicalReorderingTableCompact;
 class LRModel;
 class TargetPhraseImpl;
 
@@ -77,7 +76,6 @@ protected:
   int m_propertyInd;
 
   // COMPACT MODEL
-  LexicalReorderingTableCompact *m_compactModel;
   Phrase<Moses2::Word> *m_blank;
 
   // MEMORY MODEL
