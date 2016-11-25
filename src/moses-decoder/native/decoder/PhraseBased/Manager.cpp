@@ -35,6 +35,9 @@
 #include "../PhraseBased/TargetPhrases.h"
 #include "Logger.h"
 
+#include "../legacy/util/usage.hh"
+#include <boost/thread.hpp>
+
 using namespace std;
 
 namespace Moses2
@@ -143,6 +146,9 @@ void Manager::Decode()
 	m_search->Decode();
 
 	LOG(1, "Search took " << timer.get_elapsed_time() << " seconds");
+
+	LOG(1, "Worker " << boost::this_thread::get_id() << " mempool stats: Pool: " << (GetPool().Size() / 1024) << " kB, SystemPool: " << (GetSystemPool().Size() / 1024) << " kB");
+	LOG(1, "Global memory stats: RSS: " << (util::RSS() / 1024) << " kB, RSSMax: " << (util::RSSMax() / 1024) << " kB");
 
 	//cerr << "Finished Decode " << this << endl;
 }
