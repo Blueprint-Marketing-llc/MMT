@@ -15,7 +15,7 @@
 #include "MemPool.h"
 #include "TypeDef.h"
 #include "legacy/FactorCollection.h"
-#include "SCFG/Word.h"
+#include "DummySCFG/DummySCFG.h"
 
 namespace Moses2
 {

@@ -196,8 +196,6 @@ set(MOSES2_SOURCE_FILES
     parameters/BeamSearchOptions.h
     parameters/BookkeepingOptions.cpp
     parameters/BookkeepingOptions.h
-    parameters/ContextParameters.cpp
-    parameters/ContextParameters.h
     parameters/CubePruningOptions.cpp
     parameters/CubePruningOptions.h
     parameters/InputOptions.cpp
@@ -361,7 +359,7 @@ set(MOSES2_SOURCE_FILES
     Weights.cpp
     Weights.h
     Word.cpp
-    Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h)
+    Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h DummySCFG/DummySCFG.h)
 
 #add_executable(moses2 ${MOSES2_SOURCE_FILES} Main.cpp)
 add_library(moses2 SHARED ${MOSES2_SOURCE_FILES})
