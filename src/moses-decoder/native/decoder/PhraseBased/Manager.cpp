@@ -33,6 +33,7 @@
 #include "../legacy/Range.h"
 #include "../legacy/Timer.h"
 #include "../PhraseBased/TargetPhrases.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -124,11 +125,7 @@ void Manager::Init()
 		pt.Lookup(*this, m_inputPaths);
 	}
 
-	if(system.verbose) {
-		std::stringstream ss;
-		ss << "Collecting options took " << timer.get_elapsed_time() << " seconds" << endl;
-		cerr << ss.str();
-	}
+	LOG(1, "Collecting options took " << timer.get_elapsed_time() << " seconds");
 
 	//m_inputPaths.DeleteUnusedPaths();
 	CalcFutureScore();
@@ -145,11 +142,7 @@ void Manager::Decode()
 
 	m_search->Decode();
 
-	if(system.verbose) {
-		std::stringstream ss;
-		ss << "Search took " << timer.get_elapsed_time() << " seconds" << endl;
-		cerr << ss.str();
-	}
+	LOG(1, "Search took " << timer.get_elapsed_time() << " seconds");
 
 	//cerr << "Finished Decode " << this << endl;
 }

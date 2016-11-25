@@ -425,7 +425,7 @@ set(MOSES2_SOURCE_FILES
     Weights.cpp
     Weights.h
     Word.cpp
-    Word.h mmt/Translator.h)
+    Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h)
 
 #add_executable(moses2 ${MOSES2_SOURCE_FILES} Main.cpp)
 add_library(moses2 SHARED ${MOSES2_SOURCE_FILES})

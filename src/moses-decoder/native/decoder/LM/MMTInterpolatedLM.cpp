@@ -33,13 +33,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../PhraseBased/Manager.h"
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "TranslationTask.h"
+#include "Logger.h"
 
 #define ParseWord(w) (boost::lexical_cast<wid_t>((w)))
-
-#ifdef VERBOSE
-#undef VERBOSE
-#endif
-#define VERBOSE(l, x) ((void) 0)
 
 using namespace std;
 using namespace Moses;
@@ -82,16 +78,15 @@ ostream &operator<<(ostream &out, const ILMState &obj) {
 MMTInterpolatedLM::MMTInterpolatedLM(size_t startInd, const std::string &line) : StatefulFeatureFunction(startInd, line), m_nGramOrder(0), m_enableOOVFeature(false), m_factorType(0) {
     ReadParameters();
 
-    VERBOSE(3, GetScoreProducerDescription()
+    LOG(3, GetName()
         << " MMTInterpolatedLM::MMTInterpolatedLM() m_nGramOrder:|"
-        << m_nGramOrder << "|" << std::endl);
-    VERBOSE(3, GetScoreProducerDescription()
+        << m_nGramOrder << "|");
+    LOG(3, GetName()
         << " MMTInterpolatedLM::MMTInterpolatedLM() m_modelPath:|"
-        << m_modelPath << "|" << std::endl);
-    VERBOSE(3, GetScoreProducerDescription()
+        << m_modelPath << "|");
+    LOG(3, GetName()
         << " MMTInterpolatedLM::MMTInterpolatedLM() m_factorType:|"
-        << m_factorType << "|" << std::endl);
-
+        << m_factorType << "|");
 }
 
 MMTInterpolatedLM::~MMTInterpolatedLM() {
@@ -161,9 +156,9 @@ MMTInterpolatedLM::SetWordVector(const Hypothesis &hypo, mmt::ilm::Phrase &phras
 
 void
 MMTInterpolatedLM::CalcScore(const Phrase<Moses2::Word> &phrase, float &fullScore, float &ngramScore,
-                             size_t &oovCount) const {
-    VERBOSE(3,
-            "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const START phrase:|" << phrase << "|"
+                             size_t &oovCount, const System &system) const {
+    LOG(3,
+            "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const START phrase:|" << phrase.Debug(system) << "|"
                                                                                                 <<
                                                                                                 std::endl);
 
@@ -180,16 +175,14 @@ MMTInterpolatedLM::CalcScore(const Phrase<Moses2::Word> &phrase, float &fullScor
 
     context_t *context_vec = t_context_vec.get();
     if (context_vec == nullptr) {
-        VERBOSE(3, "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const context is null"
-            << std::endl);
+        LOG(3, "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const context is null");
     } else if (context_vec->empty()) {
-        VERBOSE(3, "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const context is empty"
-            << std::endl);
+        LOG(3, "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const context is empty");
     } else {
-        VERBOSE(3,
+        LOG(3,
                 "void MMTInterpolatedLM::CalcScore(const Phrase &phrase, ...) const context is not empty not null, size:|"
                     <<
-                    context_vec->size() << "|" << std::endl);
+                    context_vec->size() << "|");
     }
 
     CachedLM *lm = t_cached_lm.get();
@@ -225,16 +218,15 @@ MMTInterpolatedLM::EvaluateInIsolation(MemPool &pool, const System &system,
                                        const TargetPhraseImpl &targetPhrase, Scores &scores,
                                        SCORE &estimatedScore) const
 {
-    VERBOSE(2, "void LanguageModel::EvaluateInIsolation(const Phrase &source, const TargetPhrase &targetPhrase, ...)"
-        << std::endl);
+    LOG(2, "void LanguageModel::EvaluateInIsolation(const Phrase &source, const TargetPhrase &targetPhrase, ...)");
     // contains factors used by this LM
     float fullScore, nGramScore;
     size_t oovCount;
 
-    VERBOSE(2, "targetPhrase:|" << targetPhrase << "|" << std::endl);
-    VERBOSE(2, "pthread_self():" << pthread_self() << endl);
+    LOG(2, "targetPhrase:|" << targetPhrase.Debug(system) << "|");
+    LOG(2, "pthread_self():" << pthread_self() << endl);
 
-    CalcScore(targetPhrase, fullScore, nGramScore, oovCount);
+    CalcScore(targetPhrase, fullScore, nGramScore, oovCount, system);
 
     float estimateScore = fullScore - nGramScore;
 
@@ -257,16 +249,13 @@ MMTInterpolatedLM::EvaluateInIsolation(MemPool &pool, const System &system,
         estimatedScore += weightedScore;
     }
 
-    VERBOSE(2, "CalcScore of targetPhrase:|" << targetPhrase << "|: ngr=" << nGramScore << " est=" << estimateScore
-                                             << std::endl);
+    LOG(2, "CalcScore of targetPhrase:|" << targetPhrase.Debug(system) << "|: ngr=" << nGramScore << " est=" << estimateScore);
 }
 
 void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
                                             const Hypothesis &hypo, const FFState &prevState, Scores &scores,
                                             FFState &state) const {
-    VERBOSE(4,
-            "FFState* MMTInterpolatedLM::EvaluateWhenApplied(const Hypothesis &hypo, const FFState *ps, ScoreComponentCollection *out) const"
-                << std::endl);
+    LOG(4, "FFState* MMTInterpolatedLM::EvaluateWhenApplied(const Hypothesis &hypo, const FFState *ps, ScoreComponentCollection *out) const");
 
     ILMState &outState = static_cast<ILMState &>(state);
 
@@ -291,17 +280,15 @@ void MMTInterpolatedLM::EvaluateWhenApplied(const ManagerBase &mgr,
 
     context_t *context_vec = t_context_vec.get();
     if (context_vec == nullptr) {
-        VERBOSE(4, "void MMTInterpolatedLM::EvaluateWhenApplied(const Phrase &phrase, ...) const context is null"
-            << std::endl);
+        LOG(4, "void MMTInterpolatedLM::EvaluateWhenApplied(const Phrase &phrase, ...) const context is null");
     } else if (context_vec->empty()) {
-        VERBOSE(4,
-                "void MMTInterpolatedLM::EvaluateWhenApplied(const Phrase &phrase, ...) const context is empty"
-                    << std::endl);
+        LOG(4,
+                "void MMTInterpolatedLM::EvaluateWhenApplied(const Phrase &phrase, ...) const context is empty");
     } else {
-        VERBOSE(4,
+        LOG(4,
                 "void MMTInterpolatedLM::EvaluateWhenApplied(const Phrase &phrase, ...) const context is not empty not null, size:|"
                     <<
-                    context_vec->size() << "|" << std::endl);
+                    context_vec->size() << "|");
     }
 
     CachedLM *lm = t_cached_lm.get();
@@ -430,14 +417,14 @@ void MMTInterpolatedLM::SetParameter(const std::string &key, const std::string &
         m_factorType = boost::lexical_cast<FactorType>(value);
     } else if (key == "path") {
         m_modelPath = value;
-        VERBOSE(3, "m_modelPath:" << m_modelPath << std::endl);
+        LOG(3, "m_modelPath:" << m_modelPath);
     } else if (key == "order") {
         m_nGramOrder = Scan<size_t>(value);
     } else if (key == "huge-page-size") {
       lm_options.huge_page_size = Scan<size_t>(value);
     } else if (key == "adaptivity-ratio") {
         lm_options.adaptivity_ratio = Scan<float>(value);
-        VERBOSE(3, "lm_options.adaptivity_ratio:" << lm_options.adaptivity_ratio << std::endl);
+        LOG(3, "lm_options.adaptivity_ratio:" << lm_options.adaptivity_ratio);
     } else {
         StatefulFeatureFunction::SetParameter(key, value);
     }

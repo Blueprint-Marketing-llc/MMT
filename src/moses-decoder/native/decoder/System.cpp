@@ -14,6 +14,7 @@
 #include "TranslationModel/UnknownWordPenalty.h"
 #include "legacy/Util2.h"
 #include "util/exception.hh"
+#include "Logger.h"
 
 using namespace std;
 
@@ -33,6 +34,7 @@ System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *v
   params.SetParameter(cpuAffinityOffsetIncr, "cpu-affinity-increment", 1);
 
   params.SetParameter(verbose, "verbose", (size_t) 0);
+  LogLock::SetVerboseLevel((int) verbose);
 
   const PARAM_VEC *section;
 

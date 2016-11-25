@@ -80,7 +80,7 @@ namespace Moses2 {
         virtual void EmptyHypothesisState(FFState &state, const ManagerBase &mgr,
                                           const InputType &input, const Hypothesis &hypo) const override;
 
-        void CalcScore(const Phrase<Moses2::Word> &phrase, float &fullScore, float &ngramScore, size_t &oovCount) const;
+        void CalcScore(const Phrase<Moses2::Word> &phrase, float &fullScore, float &ngramScore, size_t &oovCount, const System &system) const;
 
         virtual void
         EvaluateInIsolation(MemPool &pool, const System &system, const Phrase<Moses2::Word> &source,

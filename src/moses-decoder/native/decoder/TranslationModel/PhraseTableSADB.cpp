@@ -9,6 +9,7 @@
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "../MemPool.h"
 #include "TranslationTask.h"
+#include "Logger.h"
 
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
@@ -16,11 +17,6 @@
 #include "FF/LexicalReordering/LexicalReordering.h"
 
 #define ParseWord(w) (boost::lexical_cast<wid_t>((w)))
-
-#ifdef VERBOSE
-#undef VERBOSE
-#endif
-#define VERBOSE(l, x) ((void) 0)
 
 using namespace std;
 using namespace Moses;
@@ -90,27 +86,21 @@ namespace Moses2 {
         assert(m_input.size() == 1);
         assert(m_output.size() == 1);
 
-        VERBOSE(3, GetScoreProducerDescription()
-                << " PhraseTableSADB::PhraseTableSADB() m_filePath:|"
-                << m_filePath << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
+        LOG(3, GetName()
+                << " PhraseTableSADB::PhraseTableSADB() m_modelPath:|"
+                << m_modelPath << "|");
+        LOG(3, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() table-limit:|"
-                << m_tableLimit << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
+                << m_tableLimit << "|");
+        LOG(3, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() cache-size:|"
-                << m_maxCacheSize << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
-                << " PhraseTableSADB::PhraseTableSADB() m_inputFactors:|"
-                << m_inputFactors << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
-                << " PhraseTableSADB::PhraseTableSADB() m_outputFactors:|"
-                << m_outputFactors << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
-                << " PhraseTableSADB::PhraseTableSADB() m_numScoreComponents:|"
-                << m_numScoreComponents << "|" << std::endl);
-        VERBOSE(3, GetScoreProducerDescription()
+                << m_maxCacheSize << "|");
+        LOG(3, GetName()
+                << " PhraseTableSADB::PhraseTableSADB() m_numScores:|"
+                << m_numScores << "|");
+        LOG(3, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() m_input.size():|"
-                << m_input.size() << "|" << std::endl);
+                << m_input.size() << "|");
 
         // caching for memory pt is pointless
         m_maxCacheSize = 0;
@@ -202,10 +192,10 @@ namespace Moses2 {
 
         if (key == "path") {
             m_modelPath = Scan<std::string>(value);
-            VERBOSE(3, "m_modelPath:" << m_modelPath << std::endl);
+            LOG(3, "m_modelPath:" << m_modelPath);
         } else if (key == "sample-limit") {
             pt_options.samples = Scan<int>(value);
-            VERBOSE(3, "pt_options.sample:" << pt_options.samples << std::endl);
+            LOG(3, "pt_options.sample:" << pt_options.samples);
         } else if(key == "lr-func") {
             m_lr_func_name = Scan<std::string>(value);
         } else {
