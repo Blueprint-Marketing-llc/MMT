@@ -124,45 +124,12 @@ set(MOSES2_SOURCE_FILES
     legacy/Bitmap.h
     legacy/Bitmaps.cpp
     legacy/Bitmaps.h
-    legacy/lm/bhiksha.cc
-    legacy/lm/binary_format.cc
-    legacy/lm/config.cc
-    legacy/lm/lm_exception.cc
-    legacy/lm/model.cc
-    legacy/lm/quantize.cc
-    legacy/lm/read_arpa.cc
-    legacy/lm/search_hashed.cc
-    legacy/lm/search_trie.cc
-    legacy/lm/sizes.cc
-    legacy/lm/trie.cc
-    legacy/lm/trie_sort.cc
-    legacy/lm/value_build.cc
-    legacy/lm/virtual_interface.cc
-    legacy/lm/vocab.cc
-    legacy/util/bit_packing.cc
-    legacy/util/ersatz_progress.cc
     legacy/util/exception.cc
-    legacy/util/file.cc
-    legacy/util/file_piece.cc
-    legacy/util/float_to_string.cc
-    legacy/util/integer_to_string.cc
-    legacy/util/mmap.cc
-    legacy/util/murmur_hash.cc
-    legacy/util/parallel_read.cc
-    legacy/util/pool.cc
-    legacy/util/random.cc
-    legacy/util/read_compressed.cc
-    legacy/util/scoped.cc
     legacy/util/string_piece.cc
+    legacy/util/pool.cc
+    legacy/util/scoped.cc
     legacy/util/usage.cc
-    legacy/util/double-conversion/bignum.cc
-    legacy/util/double-conversion/bignum-dtoa.cc
-    legacy/util/double-conversion/cached-powers.cc
-    legacy/util/double-conversion/diy-fp.cc
-    legacy/util/double-conversion/double-conversion.cc
-    legacy/util/double-conversion/fast-dtoa.cc
-    legacy/util/double-conversion/fixed-dtoa.cc
-    legacy/util/double-conversion/strtod.cc
+    legacy/util/murmur_hash.cc
     legacy/Factor.cpp
     legacy/Factor.h
     legacy/FactorCollection.cpp

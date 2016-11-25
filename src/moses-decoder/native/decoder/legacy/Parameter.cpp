@@ -28,9 +28,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include "Parameter.h"
 #include "InputFileStream.h"
-#include "util/string_stream.hh"
+#include <sstream>
 #include "util/exception.hh"
-#include "util/random.hh"
 #include <boost/program_options.hpp>
 
 using namespace std;
@@ -825,7 +824,7 @@ void Parameter::ConvertWeightArgsPhraseModel(const string &oldWeightName)
 
     size_t currOldInd = 0;
     for (size_t currDict = 0; currDict < translationVector.size(); currDict++) {
-      util::StringStream ptLine;
+      std::stringstream ptLine;
 
       vector<string> token = Tokenize(translationVector[currDict]);
 
@@ -982,7 +981,7 @@ void Parameter::ConvertWeightArgsDistortion()
       }
       SetWeight("LexicalReordering", indTable, weights);
 
-      util::StringStream strme;
+      std::stringstream strme;
       strme << "LexicalReordering " << "type=" << toks[1] << " ";
 
       vector<FactorType> factors = Tokenize<FactorType>(toks[0], "-");
@@ -1122,7 +1121,7 @@ void Parameter::ConvertWeightArgsGeneration(const std::string &oldWeightName,
       }
       SetWeight(newWeightName, indTable, weights);
 
-      util::StringStream strme;
+      std::stringstream strme;
       strme << "Generation " << "input-factor=" << modelToks[0] << " "
           << "output-factor=" << modelToks[1] << " " << "num-features="
           << modelToks[2] << " " << "path=" << modelToks[3];
@@ -1497,7 +1496,7 @@ struct Credit
     this->contact = contact;
     this->currentPursuits = currentPursuits;
     this->areaResponsibility = areaResponsibility;
-    this->sortId = util::rand_excl(1000);
+    this->sortId = 0;
   }
 
   bool operator<(const Credit &other) const

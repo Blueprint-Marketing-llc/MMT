@@ -72,6 +72,7 @@ const Factor *FactorCollection::AddFactor(const StringPiece &factorString,
   return factor;
 }
 
+
 const Factor *FactorCollection::GetFactor(const StringPiece &factorString,
     bool isNonTerminal)
 {
