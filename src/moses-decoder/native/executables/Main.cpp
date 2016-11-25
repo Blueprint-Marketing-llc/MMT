@@ -2,19 +2,19 @@
 #include <memory>
 #include <boost/pool/pool_alloc.hpp>
 #include "../decoder/Main.h"
-#include "System.h"
-#include "Phrase.h"
-#include "TranslationTask.h"
-#include "MemPool.h"
+#include "../decoder/System.h"
+#include "../decoder/Phrase.h"
+#include "../decoder/TranslationTask.h"
+#include "../decoder/MemPool.h"
 #ifdef HAVE_XMLRPC_C
 #include "server/Server.h"
 #endif
-#include "legacy/InputFileStream.h"
-#include "legacy/Parameter.h"
-#include "legacy/ThreadPool.h"
-#include "legacy/Timer.h"
-#include "legacy/Util2.h"
-#include "util/usage.hh"
+#include "../decoder/legacy/InputFileStream.h"
+#include "../decoder/legacy/Parameter.h"
+#include "../decoder/legacy/ThreadPool.h"
+#include "../decoder/legacy/Timer.h"
+#include "../decoder/legacy/Util2.h"
+#include "../decoder/legacy/util/usage.hh"
 
 using namespace std;
 

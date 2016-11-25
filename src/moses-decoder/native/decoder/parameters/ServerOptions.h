@@ -1,7 +1,7 @@
 // -*- mode: c++; indent-tabs-mode: nil; tab-width: 2 -*-
 #pragma once
 #include <string>
-#include "moses/Parameter.h"
+#include "../legacy/moses/Parameter.h"
 namespace Moses2
 {
 

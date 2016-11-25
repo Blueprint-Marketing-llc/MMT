@@ -1,7 +1,7 @@
 // -*- mode: c++; indent-tabs-mode: nil; tab-width: 2 -*-
 #pragma once
 #include <string>
-#include "moses/TypeDef.h"
+//#include "../legacy/moses/TypeDef.h"
 #include "OptionsBaseClass.h"
 
 namespace Moses2

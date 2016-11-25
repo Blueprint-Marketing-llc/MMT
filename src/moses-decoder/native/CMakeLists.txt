@@ -15,6 +15,7 @@ set(SOURCE_FILES
         java/JTranslation.h java/JTranslation.cpp)
 
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/decoder/legacy)
 #include_directories(${MMT_INCLUDE_DIR})
 include_directories(include)
 
