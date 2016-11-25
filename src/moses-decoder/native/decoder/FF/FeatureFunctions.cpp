@@ -17,6 +17,9 @@
 #include "../DummySCFG/DummySCFG.h"
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "util/exception.hh"
+#include "util/usage.hh"
+#include "../legacy/Timer.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -35,28 +38,30 @@ FeatureFunctions::~FeatureFunctions()
 
 void FeatureFunctions::Load()
 {
-  // load, everything but pts
-  BOOST_FOREACH(const FeatureFunction *ff, m_featureFunctions){
-  FeatureFunction *nonConstFF = const_cast<FeatureFunction*>(ff);
-  PhraseTable *pt = dynamic_cast<PhraseTable*>(nonConstFF);
+  std::vector<FeatureFunction*> non_pt_ff, pt_ff;
 
-  if (pt) {
-    // do nothing. load pt last
+  for(const FeatureFunction *ff : m_featureFunctions) {
+    FeatureFunction *nonConstFF = const_cast<FeatureFunction *>(ff);
+    if (dynamic_cast<PhraseTable *>(nonConstFF))
+      pt_ff.push_back(nonConstFF);
+    else
+      non_pt_ff.push_back(nonConstFF);
   }
-  else {
-    cerr << "Loading " << nonConstFF->GetName() << endl;
-    nonConstFF->Load(m_system);
-    cerr << "Finished loading " << nonConstFF->GetName() << endl;
-  }
-}
 
-// load pt
-BOOST_FOREACH(const PhraseTable *pt, m_phraseTables) {
-  PhraseTable *nonConstPT = const_cast<PhraseTable*>(pt);
-  cerr << "Loading " << nonConstPT->GetName() << endl;
-  nonConstPT->Load(m_system);
-  cerr << "Finished loading " << nonConstPT->GetName() << endl;
-}
+  // load pt last
+  std::vector<FeatureFunction*> load_order;
+  load_order.insert(load_order.begin(), non_pt_ff.begin(), non_pt_ff.end());
+  load_order.insert(load_order.begin(), pt_ff.begin(), pt_ff.end());
+
+  for(FeatureFunction *ff : load_order) {
+    LOG(1, "Loading " << ff->GetName());
+    Moses2::Timer timer;
+    timer.start();
+    size_t memBefore = util::RSS();
+    ff->Load(m_system);
+    size_t memAfter = util::RSS();
+    LOG(1, "Finished loading " << ff->GetName() << " in " << timer.get_elapsed_time() << " s " << " using additional " << ((memAfter - memBefore) / 1024) << " kB RAM");
+  }
 }
 
 void FeatureFunctions::Create()

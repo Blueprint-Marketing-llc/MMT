@@ -56,13 +56,13 @@ System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *v
     //return;
   }
 
-  cerr << "START featureFunctions.Load()" << endl;
+  LOG(1, "START featureFunctions.Load()");
   featureFunctions.Load();
-  cerr << "START LoadMappings()" << endl;
+  LOG(1, "START LoadMappings()");
   LoadMappings();
-  cerr << "END LoadMappings()" << endl;
+  LOG(1, "END LoadMappings()");
   LoadDecodeGraphBackoff();
-  cerr << "END LoadDecodeGraphBackoff()" << endl;
+  LOG(1, "END LoadDecodeGraphBackoff()");
 
   UTIL_THROW_IF2(options.input.xml_policy == XmlConstraint, "XmlConstraint not supported");
 
