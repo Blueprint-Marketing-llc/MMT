@@ -8,16 +8,11 @@
 #include "../TranslationModel/PhraseTableSADB.h"
 
 #include "../LM/MMTInterpolatedLM.h"
-#include "../LM/KENLM.h"
-#include "../LM/KENLMBatch.h"
-#include "../LM/LanguageModel.h"
-#include "../LM/GPULM.h"
 
 #include "Distortion.h"
 #include "LexicalReordering/LexicalReordering.h"
 #include "PhrasePenalty.h"
 #include "WordPenalty.h"
-#include "OSM/OpSequenceModel.h"
 
 #include "SkeletonStatefulFF.h"
 #include "SkeletonStatelessFF.h"
@@ -37,16 +32,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////
-class KenFactory: public FeatureFactory
-{
-public:
-  FeatureFunction *Create(size_t startInd, const std::string &line)
-  {
-    ConstructKenLM(startInd, line);
-  }
-};
-
-////////////////////////////////////////////////////////////////////
 FeatureRegistry::FeatureRegistry()
 {
   // Feature with same name as class
@@ -61,11 +46,7 @@ FeatureRegistry::FeatureRegistry()
   MOSES_FNAME2("PhraseDictionaryTransliteration", Transliteration);
   MOSES_FNAME(UnknownWordPenalty);
 
-  Add("KENLM", new KenFactory());
-
   MOSES_FNAME2("MMTILM", MMTInterpolatedLM);
-  MOSES_FNAME(KENLMBatch);
-  MOSES_FNAME(GPULM);
 
   MOSES_FNAME(LanguageModel);
 
@@ -73,7 +54,6 @@ FeatureRegistry::FeatureRegistry()
   MOSES_FNAME(LexicalReordering);
   MOSES_FNAME(PhrasePenalty);
   MOSES_FNAME(WordPenalty);
-  MOSES_FNAME(OpSequenceModel);
 
   MOSES_FNAME(SkeletonStatefulFF);
   MOSES_FNAME(SkeletonStatelessFF);

@@ -100,12 +100,6 @@ set(MOSES2_SOURCE_FILES
     FF/LexicalReordering/PhraseBasedReorderingState.h
     FF/LexicalReordering/ReorderingStack.cpp
     FF/LexicalReordering/ReorderingStack.h
-    FF/OSM/KenOSM.cpp
-    FF/OSM/KenOSM.h
-    FF/OSM/OpSequenceModel.cpp
-    FF/OSM/OpSequenceModel.h
-    FF/OSM/osmHyp.cpp
-    FF/OSM/osmHyp.h
     FF/Distortion.cpp
     FF/Distortion.h
     FF/FeatureFunction.cpp
@@ -195,16 +189,6 @@ set(MOSES2_SOURCE_FILES
     legacy/Timer.h
     legacy/Util2.cpp
     legacy/Util2.h
-    LM/GPULM.cpp
-    LM/GPULM.h
-    LM/KENLM.cpp
-    LM/KENLM.h
-    LM/KENLMBatch.cpp
-    LM/KENLMBatch.h
-    LM/LanguageModel.cpp
-    LM/LanguageModel.h
-#    LM/LanguageModelDALM.cpp
-#    LM/LanguageModelDALM.h
     LM/MMTInterpolatedLM.cpp
     LM/MMTInterpolatedLM.h
     mmt/MosesDecoder.cpp
