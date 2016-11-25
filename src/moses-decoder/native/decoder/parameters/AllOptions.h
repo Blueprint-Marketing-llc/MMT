@@ -7,7 +7,6 @@
 #include "CubePruningOptions.h"
 #include "NBestOptions.h"
 #include "ReorderingOptions.h"
-#include "ContextParameters.h"
 #include "InputOptions.h"
 #include "MBR_Options.h"
 #include "LMBR_Options.h"
@@ -26,7 +25,6 @@ namespace Moses2
     CubePruningOptions      cube;
     NBestOptions           nbest;
     ReorderingOptions reordering;
-    ContextParameters    context;
     InputOptions           input;
     MBR_Options              mbr;
     LMBR_Options            lmbr;

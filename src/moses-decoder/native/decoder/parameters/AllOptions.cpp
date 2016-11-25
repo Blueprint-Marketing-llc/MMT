@@ -24,7 +24,6 @@ namespace Moses2
     if (!cube.init(param))       return false;
     if (!nbest.init(param))      return false;
     if (!reordering.init(param)) return false;
-    if (!context.init(param))    return false;
     if (!input.init(param))      return false;
     if (!mbr.init(param))        return false;
     if (!lmbr.init(param))       return false;
