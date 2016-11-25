@@ -10,16 +10,10 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Moses definitions
-# -DHAVE_XMLRPC_C
 add_definitions(-DMAX_NUM_FACTORS=1 -DKENLM_MAX_ORDER=6 -DWITH_THREADS)
 
 include_directories(.)
 include_directories(legacy)
-#include_directories(../..)
-
-## XMLRPC
-#find_package(XMLRPC REQUIRED)
-#include_directories(${XMLRPC_INCLUDE_DIRS})
 
 ## Boost
 set(Boost_USE_STATIC_LIBS OFF)
@@ -60,30 +54,6 @@ endif (USE_SAPT)
 
 
 set(MOSES2_SOURCE_FILES
-#    defer/CubePruningBitmapStack/Misc.cpp
-#    defer/CubePruningBitmapStack/Misc.h
-#    defer/CubePruningBitmapStack/Search.cpp
-#    defer/CubePruningBitmapStack/Search.h
-#    defer/CubePruningBitmapStack/Stack.cpp
-#    defer/CubePruningBitmapStack/Stack.h
-#    defer/CubePruningCardinalStack/Misc.cpp
-#    defer/CubePruningCardinalStack/Misc.h
-#    defer/CubePruningCardinalStack/Search.cpp
-#    defer/CubePruningCardinalStack/Search.h
-#    defer/CubePruningCardinalStack/Stack.cpp
-#    defer/CubePruningCardinalStack/Stack.h
-#    defer/CubePruningPerBitmap/Misc.cpp
-#    defer/CubePruningPerBitmap/Misc.h
-#    defer/CubePruningPerBitmap/Search.cpp
-#    defer/CubePruningPerBitmap/Search.h
-#    defer/CubePruningPerBitmap/Stacks.cpp
-#    defer/CubePruningPerBitmap/Stacks.h
-#    defer/CubePruningPerMiniStack/Misc.cpp
-#    defer/CubePruningPerMiniStack/Misc.h
-#    defer/CubePruningPerMiniStack/Search.cpp
-#    defer/CubePruningPerMiniStack/Search.h
-#    defer/CubePruningPerMiniStack/Stacks.cpp
-#    defer/CubePruningPerMiniStack/Stacks.h
     FF/LexicalReordering/BidirectionalReorderingState.cpp
     FF/LexicalReordering/BidirectionalReorderingState.h
     FF/LexicalReordering/HReorderingBackwardState.cpp
@@ -215,13 +185,6 @@ set(MOSES2_SOURCE_FILES
     PhraseBased/TargetPhrases.h
     PhraseBased/TrellisPath.cpp
     PhraseBased/TrellisPath.h
-#    server/Server.cpp
-#    server/Server.h
-#    server/TranslationRequest.cpp
-#    server/TranslationRequest.h
-#    server/Translator.cpp
-#    server/Translator.h
-
     TranslationModel/PhraseTable.cpp
     TranslationModel/PhraseTable.h
     TranslationModel/PhraseTableSADB.cpp
@@ -284,7 +247,6 @@ set(MOSES2_SOURCE_FILES
 #add_executable(moses2 ${MOSES2_SOURCE_FILES} Main.cpp)
 add_library(moses2 SHARED ${MOSES2_SOURCE_FILES})
 target_link_libraries(moses2 pthread)
-#target_link_libraries(moses2 ${XMLRPC_LIBRARIES})
 target_link_libraries(moses2 ${Boost_LIBRARIES})
 target_link_libraries(moses2 ${ZLIB_LIBRARIES})
 
@@ -299,7 +261,6 @@ endif (USE_SAPT)
 
 add_executable(test-moses2 ${MOSES2_SOURCE_FILES} mmt/test_mosesdecoder.cpp)
 target_link_libraries(test-moses2 pthread)
-#target_link_libraries(test-moses2 ${XMLRPC_LIBRARIES})
 target_link_libraries(test-moses2 ${Boost_LIBRARIES})
 target_link_libraries(test-moses2 ${ZLIB_LIBRARIES})
 
