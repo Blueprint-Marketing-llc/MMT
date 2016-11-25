@@ -30,10 +30,10 @@ public class MosesDecoder implements Decoder, UpdatesListener {
 
     static {
         try {
-            System.loadLibrary("mmtdecoder");
-            logger.info("Library mmtdecoder loaded successfully");
+            System.loadLibrary("mmt-decoder");
+            logger.info("Library mmt-decoder loaded successfully");
         } catch (Throwable e) {
-            logger.error("Unable to load library mmtdecoder", e);
+            logger.error("Unable to load library mmt-decoder", e);
             throw e;
         }
     }
