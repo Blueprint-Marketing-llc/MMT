@@ -7,8 +7,9 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <decoder/TypeDef.h>
 #include "OptionsBaseClass.h"
-#include "../SCFG/Word.h"
+#include "../DummySCFG/DummySCFG.h"
 
 namespace Moses2
 {

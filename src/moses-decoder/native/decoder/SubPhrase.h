@@ -2,7 +2,7 @@
 #include <sstream>
 #include "Phrase.h"
 #include "Word.h"
-#include "SCFG/Word.h"
+#include "DummySCFG/DummySCFG.h"
 
 namespace Moses2
 {

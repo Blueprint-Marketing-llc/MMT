@@ -261,40 +261,6 @@ set(MOSES2_SOURCE_FILES
     PhraseBased/TargetPhrases.h
     PhraseBased/TrellisPath.cpp
     PhraseBased/TrellisPath.h
-    SCFG/nbest/KBestExtractor.cpp
-    SCFG/nbest/KBestExtractor.h
-    SCFG/nbest/NBest.cpp
-    SCFG/nbest/NBest.h
-    SCFG/nbest/NBestColl.cpp
-    SCFG/nbest/NBestColl.h
-    SCFG/nbest/NBests.cpp
-    SCFG/nbest/NBests.h
-    SCFG/ActiveChart.cpp
-    SCFG/ActiveChart.h
-    SCFG/Hypothesis.cpp
-    SCFG/Hypothesis.h
-    SCFG/InputPath.cpp
-    SCFG/InputPath.h
-    SCFG/InputPaths.cpp
-    SCFG/InputPaths.h
-    SCFG/Manager.cpp
-    SCFG/Manager.h
-    SCFG/Misc.cpp
-    SCFG/Misc.h
-    SCFG/PhraseImpl.cpp
-    SCFG/PhraseImpl.h
-    SCFG/Sentence.cpp
-    SCFG/Sentence.h
-    SCFG/Stack.cpp
-    SCFG/Stack.h
-    SCFG/Stacks.cpp
-    SCFG/Stacks.h
-    SCFG/TargetPhraseImpl.cpp
-    SCFG/TargetPhraseImpl.h
-    SCFG/TargetPhrases.cpp
-    SCFG/TargetPhrases.h
-    SCFG/Word.cpp
-    SCFG/Word.h
 #    server/Server.cpp
 #    server/Server.h
 #    server/TranslationRequest.cpp

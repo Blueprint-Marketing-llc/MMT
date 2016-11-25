@@ -14,11 +14,7 @@
 #include "../PhraseBased/InputPath.h"
 #include "../PhraseBased/TargetPhrases.h"
 #include "../PhraseBased/Sentence.h"
-#include "../SCFG/InputPath.h"
-#include "../SCFG/TargetPhraseImpl.h"
-#include "../SCFG/Manager.h"
-#include "../SCFG/Sentence.h"
-#include "../SCFG/ActiveChart.h"
+#include "../DummySCFG/DummySCFG.h"
 
 using namespace std;
 
@@ -148,59 +144,7 @@ void UnknownWordPenalty::Lookup(MemPool &pool,
     const SCFG::Stacks &stacks,
     SCFG::InputPath &path) const
 {
-  const System &system = mgr.system;
-
-  size_t numWords = path.range.GetNumWordsCovered();
-  if (numWords > 1) {
-    // only create 1 word phrases
-    return;
-  }
-
-  if (path.GetNumRules()) {
-	// only create rules if no other rules
-    return;
-  }
-
-  // don't do 1st if 1st word
-  if (path.range.GetStartPos() == 0) {
-    return;
-  }
-
-  // don't do 1st if last word
-  const SCFG::Sentence &sentence = static_cast<const SCFG::Sentence&>(mgr.GetInput());
-  if (path.range.GetStartPos() + 1 == sentence.GetSize()) {
-    return;
-  }
-
-  // terminal
-  const SCFG::Word &lastWord = path.subPhrase.Back();
-  //cerr << "UnknownWordPenalty lastWord=" << lastWord << endl;
-
-  const Factor *factor = lastWord[0];
-  SCFG::TargetPhraseImpl *tp = new (pool.Allocate<SCFG::TargetPhraseImpl>()) SCFG::TargetPhraseImpl(pool, *this, system, 1);
-  SCFG::Word &word = (*tp)[0];
-  word.CreateFromString(system.GetVocab(), system, factor->GetString().as_string());
-
-  tp->lhs.CreateFromString(system.GetVocab(), system, "[X]");
-
-  size_t endPos = path.range.GetEndPos();
-  const SCFG::InputPath &subPhrasePath = *mgr.GetInputPaths().GetMatrix().GetValue(endPos, 1);
-
-  SCFG::ActiveChartEntry *chartEntry = new (pool.Allocate<SCFG::ActiveChartEntry>()) SCFG::ActiveChartEntry(pool);
-  chartEntry->AddSymbolBindElement(subPhrasePath.range, lastWord, NULL, *this);
-  path.AddActiveChartEntry(GetPtInd(), chartEntry);
-
-  Scores &scores = tp->GetScores();
-  scores.PlusEquals(mgr.system, *this, -100);
-
-  MemPool &memPool = mgr.GetPool();
-  const SubPhrase<SCFG::Word> &source = path.subPhrase;
-  system.featureFunctions.EvaluateInIsolation(memPool, system, source, *tp);
-
-  SCFG::TargetPhrases *tps = new (pool.Allocate<SCFG::TargetPhrases>()) SCFG::TargetPhrases(pool);
-  tps->AddTargetPhrase(*tp);
-
-  path.AddTargetPhrasesToPath(pool, mgr.system, *this, *tps, chartEntry->GetSymbolBind());
+  UTIL_THROW2("not implemented");
 }
 
 void UnknownWordPenalty::LookupUnary(MemPool &pool,
@@ -208,6 +152,7 @@ void UnknownWordPenalty::LookupUnary(MemPool &pool,
     const SCFG::Stacks &stacks,
     SCFG::InputPath &path) const
 {
+  UTIL_THROW2("not implemented");
 }
 
 void UnknownWordPenalty::LookupNT(

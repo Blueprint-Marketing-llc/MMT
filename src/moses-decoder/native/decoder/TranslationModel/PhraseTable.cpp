@@ -12,8 +12,7 @@
 #include "../InputType.h"
 #include "../PhraseBased/Manager.h"
 #include "../PhraseBased/InputPath.h"
-#include "../SCFG/InputPath.h"
-#include "../SCFG/Manager.h"
+#include "../DummySCFG/DummySCFG.h"
 
 using namespace std;
 
@@ -128,11 +127,7 @@ void PhraseTable::LookupUnary(MemPool &pool,
     const SCFG::Stacks &stacks,
     SCFG::InputPath &path) const
 {
-  //cerr << "BEFORE LookupUnary" << path.Debug(mgr.system) << endl;
-  size_t startPos = path.range.GetStartPos();
-  const SCFG::InputPath *prevPath = mgr.GetInputPaths().GetMatrix().GetValue(startPos, 0);
-  LookupNT(pool, mgr, path.range, *prevPath, stacks, path);
-  //cerr << "AFTER LookupUnary" << path.Debug(mgr.system) << endl;
+  UTIL_THROW2("not implemented");
 }
 
 void PhraseTable::LookupNT(
@@ -143,23 +138,7 @@ void PhraseTable::LookupNT(
     const SCFG::Stacks &stacks,
     SCFG::InputPath &outPath) const
 {
-  size_t endPos = outPath.range.GetEndPos();
-
-  const Range &prevRange = prevPath.range;
-
-  size_t startPos = prevRange.GetEndPos() + 1;
-  size_t ntSize = endPos - startPos + 1;
-
-  const SCFG::Stack &ntStack = stacks.GetStack(startPos, ntSize);
-  const SCFG::Stack::Coll &stackColl = ntStack.GetColl();
-
-  BOOST_FOREACH (const SCFG::Stack::Coll::value_type &valPair, stackColl) {
-    const SCFG::Word &ntSought = valPair.first;
-    const Moses2::HypothesisColl *hypos = valPair.second;
-    const Moses2::Hypotheses &sortedHypos = hypos->GetSortedAndPruneHypos(mgr, mgr.arcLists);
-    //cerr << "ntSought=" << ntSought << ntSought.isNonTerminal << endl;
-    LookupGivenWord(pool, mgr, prevPath, ntSought, &sortedHypos, subPhraseRange, outPath);
-  }
+  UTIL_THROW2("not implemented");
 }
 
 void PhraseTable::LookupGivenWord(
@@ -171,14 +150,7 @@ void PhraseTable::LookupGivenWord(
     const Moses2::Range &subPhraseRange,
     SCFG::InputPath &outPath) const
 {
-  size_t ptInd = GetPtInd();
-
-
-  BOOST_FOREACH(const SCFG::ActiveChartEntry *prevEntry, prevPath.GetActiveChart(ptInd).entries) {
-    //cerr << "BEFORE LookupGivenNode=" << prevPath << endl;
-    LookupGivenNode(pool, mgr, *prevEntry, wordSought, hypos, subPhraseRange, outPath);
-    //cerr << "AFTER LookupGivenNode=" << prevPath << endl;
-  }
+  UTIL_THROW2("not implemented");
 }
 
 }

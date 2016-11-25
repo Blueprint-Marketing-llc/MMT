@@ -14,8 +14,7 @@
 
 #include "../TranslationModel/PhraseTable.h"
 #include "../TranslationModel/UnknownWordPenalty.h"
-#include "../SCFG/TargetPhraseImpl.h"
-#include "../SCFG/Word.h"
+#include "../DummySCFG/DummySCFG.h"
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "util/exception.hh"
 
@@ -177,14 +176,7 @@ void FeatureFunctions::EvaluateInIsolation(
     const Phrase<SCFG::Word> &source,
     SCFG::TargetPhraseImpl &targetPhrase) const
 {
-  SCORE estimatedScore = 0;
-
-  BOOST_FOREACH(const FeatureFunction *ff, m_featureFunctions){
-    Scores& scores = targetPhrase.GetScores();
-    ff->EvaluateInIsolation(pool, system, source, targetPhrase, scores, estimatedScore);
-  }
-
-  targetPhrase.SetEstimatedScore(estimatedScore);
+  UTIL_THROW2("not implemented");
 }
 
 void FeatureFunctions::EvaluateAfterTablePruning(MemPool &pool,
@@ -198,9 +190,7 @@ void FeatureFunctions::EvaluateAfterTablePruning(MemPool &pool,
 void FeatureFunctions::EvaluateAfterTablePruning(MemPool &pool, const SCFG::TargetPhrases &tps,
     const Phrase<SCFG::Word> &sourcePhrase) const
 {
-  BOOST_FOREACH(const FeatureFunction *ff, m_featureFunctions) {
-    ff->EvaluateAfterTablePruning(pool, tps, sourcePhrase);
-  }
+  UTIL_THROW2("not implemented");
 }
 
 void FeatureFunctions::EvaluateWhenAppliedBatch(const Batch &batch) const

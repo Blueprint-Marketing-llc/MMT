@@ -2,7 +2,6 @@
 #include "System.h"
 #include "InputType.h"
 #include "PhraseBased/Manager.h"
-#include "SCFG/Manager.h"
 
 using namespace std;
 
@@ -17,7 +16,7 @@ TranslationTask::TranslationTask(System &system,
 	  m_mgr.reset(new Manager(system, *this, line, translationId));
   }
   else {
-	  m_mgr.reset(new SCFG::Manager(system, *this, line, translationId));
+    UTIL_THROW2("SCFG not implemented anymore");
   }
   m_featureWeights = system.GetWeights();
 }
