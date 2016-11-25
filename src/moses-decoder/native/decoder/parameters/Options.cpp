@@ -1,0 +1,15 @@
+// saves compile time
+
+#include "AllOptions.cpp"
+#include "BookkeepingOptions.cpp"
+#include "CubePruningOptions.cpp"
+#include "InputOptions.cpp"
+#include "LMBR_Options.cpp"
+#include "MBR_Options.cpp"
+#include "NBestOptions.cpp"
+#include "OOVHandlingOptions.cpp"
+#include "ReorderingOptions.cpp"
+#include "ReportingOptions.cpp"
+#include "SearchOptions.cpp"
+#include "ServerOptions.cpp"
+#include "SyntaxOptions.cpp"

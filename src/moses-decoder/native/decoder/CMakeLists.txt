@@ -191,35 +191,22 @@ set(MOSES2_SOURCE_FILES
     MorphoTrie/MorphTrie.h
     MorphoTrie/Node.h
     MorphoTrie/utils.h
-    parameters/AllOptions.cpp
+    parameters/Options.cpp
     parameters/AllOptions.h
     parameters/BeamSearchOptions.h
-    parameters/BookkeepingOptions.cpp
     parameters/BookkeepingOptions.h
-    parameters/CubePruningOptions.cpp
     parameters/CubePruningOptions.h
-    parameters/InputOptions.cpp
     parameters/InputOptions.h
-    parameters/LMBR_Options.cpp
     parameters/LMBR_Options.h
     parameters/LookupOptions.h
-    parameters/MBR_Options.cpp
     parameters/MBR_Options.h
-    parameters/NBestOptions.cpp
     parameters/NBestOptions.h
-    parameters/OOVHandlingOptions.cpp
     parameters/OOVHandlingOptions.h
-    parameters/OptionsBaseClass.cpp
     parameters/OptionsBaseClass.h
-    parameters/ReorderingOptions.cpp
     parameters/ReorderingOptions.h
-    parameters/ReportingOptions.cpp
     parameters/ReportingOptions.h
-    parameters/SearchOptions.cpp
     parameters/SearchOptions.h
-    parameters/ServerOptions.cpp
     parameters/ServerOptions.h
-    parameters/SyntaxOptions.cpp
     parameters/SyntaxOptions.h
     PhraseBased/Batch/Search.cpp
     PhraseBased/Batch/Search.h
