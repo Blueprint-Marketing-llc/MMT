@@ -52,6 +52,7 @@ uint8_t *MemPool::More(std::size_t size)
     std::size_t amount = std::max(m_currSize, size);
 
     Page *page = new Page(amount);
+    m_prevTotalBytes += m_pages[m_currPage-1]->size; // previous page now completely used
     m_pages.push_back(page);
 
     uint8_t *ret = page->mem;

@@ -74,6 +74,11 @@ public:
   // re-use pool
   void Reset();
 
+  size_t Size() const {
+    Page &page = *m_pages[m_currPage];
+    return m_prevTotalBytes + (current_ - page.mem);
+  }
+
 private:
   uint8_t *More(std::size_t size);
 
@@ -82,6 +87,8 @@ private:
   size_t m_currSize;
   size_t m_currPage;
   uint8_t *current_;
+
+  size_t m_prevTotalBytes = 0;
 
   // no copying
   MemPool(const MemPool &);
