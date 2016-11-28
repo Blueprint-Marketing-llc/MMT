@@ -4,6 +4,11 @@ project(mmt-decoder)
 # where to find cmake_modules modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 
+# from decoder/CMakeLists.txt  (are these necessary?)
+#set(CMAKE_MACOSX_RPATH 1)
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+#set(LIBRARY_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Moses definitions
@@ -19,7 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/decoder/legacy)
 #include_directories(${MMT_INCLUDE_DIR})
 include_directories(include)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} $<TARGET_OBJECTS:moses2>)
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 file(GLOB executables executables/*.cpp)
@@ -27,7 +32,6 @@ foreach(exefile ${executables})
     get_filename_component(exe ${exefile} NAME_WE)
     add_executable(${exe} ${exefile})
     target_link_libraries(${exe} ${PROJECT_NAME})
-    target_link_libraries(${exe} moses2)  # TODO(david): replace with MOSES2_SOURCE_FILES / object bundle.
 endforeach()
 
 # External Libraries
@@ -75,5 +79,17 @@ endif (USE_SAPT)
 install(FILES include/decoder/MosesDecoder.h DESTINATION include)
 
 add_subdirectory(decoder)
-target_link_libraries(${PROJECT_NAME} moses2)  # TODO(david): replace with MOSES2_SOURCE_FILES / object bundle.
 
+target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
+
+if (USE_MMTILM)
+    target_link_libraries(${PROJECT_NAME} ${Rocksdb_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${MMTILM_LIBRARIES})
+endif (USE_MMTILM)
+
+if (USE_SAPT)
+    target_link_libraries(${PROJECT_NAME} ${Rocksdb_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${SAPT_LIBRARIES})
+endif (USE_SAPT)

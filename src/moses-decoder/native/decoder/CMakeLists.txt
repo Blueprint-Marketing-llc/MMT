@@ -1,57 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(moses2)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
-
-set(CMAKE_MACOSX_RPATH 1)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/lib)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 # Moses definitions
 add_definitions(-DMAX_NUM_FACTORS=1 -DKENLM_MAX_ORDER=6 -DWITH_THREADS)
 
 include_directories(.)
 include_directories(legacy)
-
-## Boost
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-
-find_package(Boost 1.55.0 REQUIRED COMPONENTS filesystem iostreams thread system program_options)
-include_directories(${Boost_INCLUDE_DIRS})
-
-## ZLIB
-find_package(ZLIB REQUIRED)
-
-if (USE_MMTILM)
-    find_package(Rocksdb REQUIRED)
-    find_package(MMTCommons REQUIRED)
-    find_package(MMTILM REQUIRED)
-    add_definitions(-DLM_MMTILM=true)
-endif (USE_MMTILM)
-
-if (USE_SAPT)
-    find_package(Rocksdb REQUIRED)
-    find_package(SAPT REQUIRED)
-    find_package(MMTCommons REQUIRED)
-    add_definitions(-DSAPT=true)
-endif (USE_SAPT)
-
-if (USE_MMTILM)
-    include_directories(${Rocksdb_INCLUDE_DIRS})
-    include_directories(${MMTILM_INCLUDE_DIRS})
-    include_directories(${MMTCommons_INCLUDE_DIR})
-endif (USE_MMTILM)
-
-if (USE_SAPT)
-    include_directories(${Rocksdb_INCLUDE_DIRS})
-    include_directories(${SAPT_INCLUDE_DIRS})
-    include_directories(${MMTCommons_INCLUDE_DIR})
-endif (USE_SAPT)
-
 
 set(MOSES2_SOURCE_FILES
     FF/LexicalReordering/BidirectionalReorderingState.cpp
@@ -210,7 +164,7 @@ set(MOSES2_SOURCE_FILES
     InputPathsBase.h
     InputType.cpp
     InputType.h
-    Main.h
+        moses2-main.h
     ManagerBase.cpp
     ManagerBase.h
     MemPool.cpp
@@ -244,27 +198,4 @@ set(MOSES2_SOURCE_FILES
     Word.cpp
     Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h DummySCFG/DummySCFG.h)
 
-#add_executable(moses2 ${MOSES2_SOURCE_FILES} Main.cpp)
-add_library(moses2 SHARED ${MOSES2_SOURCE_FILES})
-target_link_libraries(moses2 pthread)
-target_link_libraries(moses2 ${Boost_LIBRARIES})
-target_link_libraries(moses2 ${ZLIB_LIBRARIES})
-
-if (USE_MMTILM)
-    target_link_libraries(moses2 ${Rocksdb_LIBRARIES})
-    target_link_libraries(moses2 ${MMTILM_LIBRARIES})
-endif (USE_MMTILM)
-
-if (USE_SAPT)
-    target_link_libraries(moses2 ${SAPT_LIBRARIES})
-endif (USE_SAPT)
-
-add_executable(test-moses2 ${MOSES2_SOURCE_FILES} mmt/test_mosesdecoder.cpp)
-target_link_libraries(test-moses2 pthread)
-target_link_libraries(test-moses2 ${Boost_LIBRARIES})
-target_link_libraries(test-moses2 ${ZLIB_LIBRARIES})
-
-target_link_libraries(test-moses2 ${Rocksdb_LIBRARIES})
-target_link_libraries(test-moses2 ${MMTILM_LIBRARIES})
-
-target_link_libraries(test-moses2 ${SAPT_LIBRARIES})
+add_library(moses2 OBJECT ${MOSES2_SOURCE_FILES})
