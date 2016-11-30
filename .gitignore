@@ -4,6 +4,8 @@
 /vendor/cassandra-*
 /vendor/kafka-*
 
+javah/
+
 build/
 
 # OSX
