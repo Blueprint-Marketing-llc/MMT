@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.6)
-project(mmt-common-interfaces)
+cmake_minimum_required(VERSION 3.2)
+project(mmtc) # mmt-common
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -10,9 +10,14 @@ set(SOURCE_FILES
 
         include/mmt/aligner/Aligner.h
         include/mmt/aligner/AlignerModel.h
-        include/mmt/vocabulary/Vocabulary.h)
+        include/mmt/vocabulary/Vocabulary.h
 
-add_library(${PROJECT_NAME} INTERFACE)
+        include/mmt/logging/Log.h
+        include/mmt/logging/Log.cpp
+        )
+
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 include_directories(include)
 

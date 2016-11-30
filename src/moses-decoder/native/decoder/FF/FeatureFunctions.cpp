@@ -19,7 +19,7 @@
 #include "util/exception.hh"
 #include "util/usage.hh"
 #include "../legacy/Timer.h"
-#include "Logger.h"
+#include <mmt/logging/Log.h>
 
 using namespace std;
 
@@ -54,13 +54,13 @@ void FeatureFunctions::Load()
   load_order.insert(load_order.begin(), pt_ff.begin(), pt_ff.end());
 
   for(FeatureFunction *ff : load_order) {
-    LOG(1, "Loading " << ff->GetName());
+    Log(INFO, "Loading " << ff->GetName());
     Moses2::Timer timer;
     timer.start();
     size_t memBefore = util::RSS();
     ff->Load(m_system);
     size_t memAfter = util::RSS();
-    LOG(1, "Finished loading " << ff->GetName() << " in " << timer.get_elapsed_time() << " s " << " using additional " << ((memAfter - memBefore) / 1024) << " kB RAM");
+    Log(INFO, "Finished loading " << ff->GetName() << " in " << timer.get_elapsed_time() << " s " << " using additional " << ((memAfter - memBefore) / 1024) << " kB RAM");
   }
 }
 

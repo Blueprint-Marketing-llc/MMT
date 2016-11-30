@@ -5,9 +5,13 @@
 
 set(MMTCommons_SEARCH_HEADER_PATHS ${MMT_ROOT}/src/common-interfaces/native/include)
 
+set(MMTCommons_SEARCH_LIB_PATHS ${MMT_ROOT}/build/lib)
+
 find_path(MMTCommons_INCLUDE_DIR mmt/sentence.h PATHS ${MMTCommons_SEARCH_HEADER_PATHS})
 
-if (MMTCommons_INCLUDE_DIR)
+find_library(MMTCommons_LIBRARIES NAMES mmtc PATHS ${MMTCommons_SEARCH_LIB_PATHS})
+
+if (MMTCommons_INCLUDE_DIR AND MMTCommons_LIBRARIES)
     set(MMTCommons_FOUND TRUE)
 else ()
     set(MMTCommons_FOUND FALSE)
@@ -30,4 +34,6 @@ endif ()
 
 mark_as_advanced(
         MMTCommons_INCLUDE_DIR
+        MMTCommons_LIBRARIES
+        MMTCommons_FOUND
 )

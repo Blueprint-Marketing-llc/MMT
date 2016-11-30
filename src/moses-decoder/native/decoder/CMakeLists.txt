@@ -196,6 +196,6 @@ set(MOSES2_SOURCE_FILES
     Weights.cpp
     Weights.h
     Word.cpp
-    Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h DummySCFG/DummySCFG.h)
+    Word.h mmt/Translator.h DummySCFG/DummySCFG.h)
 
 add_library(moses2 OBJECT ${MOSES2_SOURCE_FILES})
