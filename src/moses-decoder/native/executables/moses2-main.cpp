@@ -16,24 +16,9 @@
 #include "../decoder/legacy/Util2.h"
 #include "../decoder/legacy/util/usage.hh"
 
-#include "mmt/sentence.h"
-#include <algorithm>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#define ParseWord(w) (boost::lexical_cast<mmt::wid_t>((w)))
-
 using namespace std;
 
 //extern size_t g_numHypos;
-
-static std::vector<mmt::wid_t> ParseSentence(std::string text) {
-  std::vector<std::string> words;
-  std::vector<mmt::wid_t> wids;
-  boost::split(words, text, boost::is_any_of(" "), boost::token_compress_on); // token_compress_on: Compress adjacent tokens
-  wids.resize(words.size());
-  std::transform(words.begin(), words.end(), wids.begin(), [](std::string w) { return ParseWord(w); });
-  return wids;
-}
 
 int main(int argc, const char** argv)
 {
@@ -111,7 +96,7 @@ void batch_run(Moses2::Parameter &params, Moses2::System &system, Moses2::Thread
   string line;
   while (getline(inStream, line)) {
     //cerr << "line=" << line << endl;
-      boost::shared_ptr<Moses2::TranslationTask> task(new Moses2::TranslationTask(system, ParseSentence(line), translationId));
+      boost::shared_ptr<Moses2::TranslationTask> task(new Moses2::TranslationTask(system, line, translationId));
 
     //cerr << "START pool.Submit()" << endl;
     pool.Submit(task);
