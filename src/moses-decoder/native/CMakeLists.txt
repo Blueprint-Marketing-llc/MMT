@@ -24,7 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/decoder/legacy)
 #include_directories(${MMT_INCLUDE_DIR})
 include_directories(include)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} $<TARGET_OBJECTS:moses2>)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} $<TARGET_OBJECTS:moses2> $<TARGET_OBJECTS:moses2_legacy>)
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 file(GLOB executables executables/*.cpp)
@@ -32,6 +32,7 @@ foreach(exefile ${executables})
     get_filename_component(exe ${exefile} NAME_WE)
     add_executable(${exe} ${exefile})
     target_link_libraries(${exe} ${PROJECT_NAME})
+    install(TARGETS ${exe} RUNTIME DESTINATION bin)
 endforeach()
 
 # External Libraries
@@ -95,3 +96,18 @@ if (USE_SAPT)
     target_link_libraries(${PROJECT_NAME} ${Rocksdb_LIBRARIES})
     target_link_libraries(${PROJECT_NAME} ${SAPT_LIBRARIES})
 endif (USE_SAPT)
+
+
+
+add_subdirectory(mertdir)
+
+# MERT_EXECUTABLES defined in mert/CMakeLists.txt
+foreach(exefile ${MERT_EXECUTABLES})
+    get_filename_component(exe ${exefile} NAME_WE)
+    add_executable(${exe} ${exefile} $<TARGET_OBJECTS:mert_objs> $<TARGET_OBJECTS:moses2_legacy>)
+    target_link_libraries(${exe} ${Boost_LIBRARIES})
+    target_link_libraries(${exe} ${ZLIB_LIBRARIES})
+    #target_link_libraries(${exe} ${MMTCommons_LIBRARIES})  # because of undefined references via PhraseTableSADB -> LogLock... quite ugly, sorry. phrase table should never be linked here. $<TARGET_OBJECTS:moses2> is too much.
+    target_link_libraries(${exe} pthread)
+    install(TARGETS ${exe} RUNTIME DESTINATION bin)
+endforeach()
