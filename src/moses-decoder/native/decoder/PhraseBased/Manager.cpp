@@ -333,13 +333,12 @@ void Manager::OutputNBest(size_t nbest_size, std::vector<ResponseHypothesis> &nb
     if (ok) {
       ++bestInd;
 
-      stringstream text;
-      path->OutputToStream(text, system);
+      string tgtPhrase = path->OutputTargetPhrase(system);
 
       stringstream fvals;
       path->GetScores().OutputBreakdown(fvals, system);
 
-      nbest.push_back(ResponseHypothesis{text.str(), path->GetScores().GetTotalScore(), fvals.str()});
+      nbest.push_back(ResponseHypothesis{tgtPhrase, path->GetScores().GetTotalScore(), fvals.str()});
     }
 
     // create next paths
