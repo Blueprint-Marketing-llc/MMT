@@ -24,7 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/decoder/legacy)
 #include_directories(${MMT_INCLUDE_DIR})
 include_directories(include)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} $<TARGET_OBJECTS:moses2>)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} $<TARGET_OBJECTS:moses2> $<TARGET_OBJECTS:moses2_legacy>)
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 file(GLOB executables executables/*.cpp)
@@ -32,6 +32,7 @@ foreach(exefile ${executables})
     get_filename_component(exe ${exefile} NAME_WE)
     add_executable(${exe} ${exefile})
     target_link_libraries(${exe} ${PROJECT_NAME})
+    install(TARGETS ${exe} RUNTIME DESTINATION bin)
 endforeach()
 
 # External Libraries
@@ -52,28 +53,28 @@ include_directories(${JNI_INCLUDE_DIRS})
 ## ZLIB
 find_package(ZLIB REQUIRED)
 
+## MMT commons
+find_package(MMTCommons REQUIRED)
+include_directories(${MMTCommons_INCLUDE_DIR})
+
 ## MMT interpolated LM
 if (USE_MMTILM)
     find_package(Rocksdb REQUIRED)
-    find_package(MMTCommons REQUIRED)
     find_package(MMTILM REQUIRED)
     add_definitions(-DLM_MMTILM=true)
 
     include_directories(${Rocksdb_INCLUDE_DIRS})
     include_directories(${MMTILM_INCLUDE_DIRS})
-    include_directories(${MMTCommons_INCLUDE_DIR})
 endif (USE_MMTILM)
 
 ## MMT sampling phrasetable
 if (USE_SAPT)
     find_package(Rocksdb REQUIRED)
     find_package(SAPT REQUIRED)
-    find_package(MMTCommons REQUIRED)
     add_definitions(-DSAPT=true)
 
     include_directories(${Rocksdb_INCLUDE_DIRS})
     include_directories(${SAPT_INCLUDE_DIRS})
-    include_directories(${MMTCommons_INCLUDE_DIR})
 endif (USE_SAPT)
 
 install(FILES include/decoder/MosesDecoder.h DESTINATION include)
@@ -84,6 +85,8 @@ target_link_libraries(${PROJECT_NAME} pthread)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
 
+target_link_libraries(${PROJECT_NAME} ${MMTCommons_LIBRARIES})
+
 if (USE_MMTILM)
     target_link_libraries(${PROJECT_NAME} ${Rocksdb_LIBRARIES})
     target_link_libraries(${PROJECT_NAME} ${MMTILM_LIBRARIES})
@@ -93,3 +96,18 @@ if (USE_SAPT)
     target_link_libraries(${PROJECT_NAME} ${Rocksdb_LIBRARIES})
     target_link_libraries(${PROJECT_NAME} ${SAPT_LIBRARIES})
 endif (USE_SAPT)
+
+
+
+add_subdirectory(mertdir)
+
+# MERT_EXECUTABLES defined in mert/CMakeLists.txt
+foreach(exefile ${MERT_EXECUTABLES})
+    get_filename_component(exe ${exefile} NAME_WE)
+    add_executable(${exe} ${exefile} $<TARGET_OBJECTS:mert_objs> $<TARGET_OBJECTS:moses2_legacy>)
+    target_link_libraries(${exe} ${Boost_LIBRARIES})
+    target_link_libraries(${exe} ${ZLIB_LIBRARIES})
+    #target_link_libraries(${exe} ${MMTCommons_LIBRARIES})  # because of undefined references via PhraseTableSADB -> LogLock... quite ugly, sorry. phrase table should never be linked here. $<TARGET_OBJECTS:moses2> is too much.
+    target_link_libraries(${exe} pthread)
+    install(TARGETS ${exe} RUNTIME DESTINATION bin)
+endforeach()

@@ -14,7 +14,7 @@
 #include "TranslationModel/UnknownWordPenalty.h"
 #include "legacy/Util2.h"
 #include "util/exception.hh"
-#include "Logger.h"
+#include <mmt/logging/Log.h>
 
 using namespace std;
 
@@ -34,7 +34,7 @@ System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *v
   params.SetParameter(cpuAffinityOffsetIncr, "cpu-affinity-increment", 1);
 
   params.SetParameter(verbose, "verbose", (size_t) 0);
-  LogLock::SetVerboseLevel((int) verbose);
+  mmt::logging::LogLock::SetVerboseLevel((int) verbose);
 
   const PARAM_VEC *section;
 
@@ -56,13 +56,13 @@ System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *v
     //return;
   }
 
-  LOG(1, "START featureFunctions.Load()");
+  Log(INFO, "START featureFunctions.Load()");
   featureFunctions.Load();
-  LOG(1, "START LoadMappings()");
+  Log(INFO, "START LoadMappings()");
   LoadMappings();
-  LOG(1, "END LoadMappings()");
+  Log(INFO, "END LoadMappings()");
   LoadDecodeGraphBackoff();
-  LOG(1, "END LoadDecodeGraphBackoff()");
+  Log(INFO, "END LoadDecodeGraphBackoff()");
 
   UTIL_THROW_IF2(options.input.xml_policy == XmlConstraint, "XmlConstraint not supported");
 

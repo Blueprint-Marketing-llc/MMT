@@ -44,38 +44,6 @@ set(MOSES2_SOURCE_FILES
     FF/StatelessFeatureFunction.h
     FF/WordPenalty.cpp
     FF/WordPenalty.h
-    legacy/Bitmap.cpp
-    legacy/Bitmap.h
-    legacy/Bitmaps.cpp
-    legacy/Bitmaps.h
-    legacy/util/exception.cc
-    legacy/util/string_piece.cc
-    legacy/util/pool.cc
-    legacy/util/scoped.cc
-    legacy/util/usage.cc
-    legacy/util/murmur_hash.cc
-    legacy/Factor.cpp
-    legacy/Factor.h
-    legacy/FactorCollection.cpp
-    legacy/FactorCollection.h
-    legacy/gzfilebuf.h
-    legacy/InputFileStream.cpp
-    legacy/InputFileStream.h
-    legacy/Matrix.cpp
-    legacy/Matrix.h
-    legacy/OutputCollector.h
-    legacy/OutputFileStream.cpp
-    legacy/OutputFileStream.h
-    legacy/Parameter.cpp
-    legacy/Parameter.h
-    legacy/Range.cpp
-    legacy/Range.h
-    legacy/ThreadPool.cpp
-    legacy/ThreadPool.h
-    legacy/Timer.cpp
-    legacy/Timer.h
-    legacy/Util2.cpp
-    legacy/Util2.h
     LM/MMTInterpolatedLM.cpp
     LM/MMTInterpolatedLM.h
     mmt/MosesDecoder.cpp
@@ -167,8 +135,6 @@ set(MOSES2_SOURCE_FILES
         moses2-main.h
     ManagerBase.cpp
     ManagerBase.h
-    MemPool.cpp
-    MemPool.h
     Phrase.cpp
     Phrase.h
     PhraseImplTemplate.h
@@ -196,6 +162,64 @@ set(MOSES2_SOURCE_FILES
     Weights.cpp
     Weights.h
     Word.cpp
-    Word.h mmt/Translator.h legacy/Logger.cpp legacy/Logger.h DummySCFG/DummySCFG.h)
+    Word.h mmt/Translator.h DummySCFG/DummySCFG.h)
+
+set(MOSES2_LEGACY_SOURCE_FILES
+    legacy/Bitmap.cpp
+    legacy/Bitmap.h
+    legacy/Bitmaps.cpp
+    legacy/Bitmaps.h
+
+    legacy/util/file_piece.cc
+    legacy/util/file.cc
+    legacy/util/mmap.cc
+    legacy/util/read_compressed.cc
+    legacy/util/parallel_read.cc
+    legacy/util/exception.cc
+    legacy/util/ersatz_progress.cc
+    legacy/util/string_piece.cc
+    legacy/util/pool.cc
+    legacy/util/scoped.cc
+    legacy/util/usage.cc
+    legacy/util/murmur_hash.cc
+    legacy/util/random.cc
+
+    legacy/util/double-conversion/bignum-dtoa.cc
+    legacy/util/double-conversion/bignum.cc
+    legacy/util/double-conversion/cached-powers.cc
+    legacy/util/double-conversion/diy-fp.cc
+    legacy/util/double-conversion/double-conversion.cc
+    legacy/util/double-conversion/fast-dtoa.cc
+    legacy/util/double-conversion/fixed-dtoa.cc
+    legacy/util/double-conversion/strtod.cc
+
+    legacy/Factor.cpp
+    legacy/Factor.h
+    legacy/FactorCollection.cpp
+    legacy/FactorCollection.h
+    legacy/gzfilebuf.h
+    legacy/InputFileStream.cpp
+    legacy/InputFileStream.h
+    legacy/Matrix.cpp
+    legacy/Matrix.h
+    legacy/OutputCollector.h
+    legacy/OutputFileStream.cpp
+    legacy/OutputFileStream.h
+    legacy/Parameter.cpp
+    legacy/Parameter.h
+    legacy/Range.cpp
+    legacy/Range.h
+    legacy/ThreadPool.cpp
+    legacy/ThreadPool.h
+    legacy/Timer.cpp
+    legacy/Timer.h
+    legacy/Util2.cpp
+    legacy/Util2.h
+
+    # Bitmap references MemPool
+    MemPool.cpp
+    MemPool.h
+    )
 
 add_library(moses2 OBJECT ${MOSES2_SOURCE_FILES})
+add_library(moses2_legacy OBJECT ${MOSES2_LEGACY_SOURCE_FILES})

@@ -9,7 +9,7 @@
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "../MemPool.h"
 #include "TranslationTask.h"
-#include "Logger.h"
+#include <mmt/logging/Log.h>
 
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
@@ -86,19 +86,19 @@ namespace Moses2 {
         assert(m_input.size() == 1);
         assert(m_output.size() == 1);
 
-        LOG(3, GetName()
+        Log(TRACE, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() m_modelPath:|"
                 << m_modelPath << "|");
-        LOG(3, GetName()
+        Log(TRACE, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() table-limit:|"
                 << m_tableLimit << "|");
-        LOG(3, GetName()
+        Log(TRACE, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() cache-size:|"
                 << m_maxCacheSize << "|");
-        LOG(3, GetName()
+        Log(TRACE, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() m_numScores:|"
                 << m_numScores << "|");
-        LOG(3, GetName()
+        Log(TRACE, GetName()
                 << " PhraseTableSADB::PhraseTableSADB() m_input.size():|"
                 << m_input.size() << "|");
 
@@ -192,10 +192,10 @@ namespace Moses2 {
 
         if (key == "path") {
             m_modelPath = Scan<std::string>(value);
-            LOG(3, "m_modelPath:" << m_modelPath);
+            Log(TRACE, "m_modelPath:" << m_modelPath);
         } else if (key == "sample-limit") {
             pt_options.samples = Scan<int>(value);
-            LOG(3, "pt_options.sample:" << pt_options.samples);
+            Log(TRACE, "pt_options.sample:" << pt_options.samples);
         } else if(key == "lr-func") {
             m_lr_func_name = Scan<std::string>(value);
         } else {
