@@ -11,7 +11,7 @@ namespace Moses2
     , factor(20)
     , enabled(false)
     , print_trees(false)
-    , only_distinct(false)
+    , only_distinct(true) // must be true for tuning MMT
     , include_alignment_info(false)
     , include_feature_labels(true)
     , include_segmentation(false)
