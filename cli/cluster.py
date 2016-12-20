@@ -533,10 +533,27 @@ class ClusterNode(object):
                 fileutils.makedirs(mert_wd, exist_ok=True)
 
                 with tempfile.NamedTemporaryFile() as runtime_moses_ini:
+                    #
+                    # Reasoning for MERT options: "-t random-direction -m 16"
+                    # (see https://github.com/ModernMT/MMT/issues/209 "MERT weights going to all-zero when tuning with moses2 (except for DM0_2 = 1.0)")
+                    #
+                    # When using moses2, MERT is hitting these weights in iteration 7 with the toy data from examples/data/train:
+                    # 
+                    # "The decoder died. CONFIG WAS -weight-overwrite 'PhrasePenalty0= 0.000000 # Sapt= 0.000000 0.000000 0.000000 0.000000 InterpolatedLM= 0.000000 # Distortion0= 0.000000 WordPenalty0= -0.000000 DM0= 0.000000 -0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 0.000000'"
+                    # 
+                    # Two sentences in an n-best list have almost exactly the same feature value, not exactly but ~ up to 32-bit float machine precision (epsilon).
+                    # The Powell search algo in MERT is looking for changing line slopes along a feature weight in `Optimizer::LineOptimize()`. The intersection point of two lines with almost exactly the same # slope lies very far away in `intersect()` and unfortunately that's a sentence on the border having the best BLEU.
+                    # There's no reason not to have n-best sentences with the same feature weight (note the reordering statistics in that DM0_2 feature [DiscontinuousLeftOrientation] are rational numbers).
+                    # 
+                    # '-t random-direction' avoids going in straight axis directions, and always goes in a random direction instead.
+                    # 16 random directions, because the classic Powell search also does 16 directions (in the direction of each feature value, of which there are 16).
+                    # 
+                    # so, we use the following MERT options: "-t random-direction -m 16"
+                    #
                     command = [self._mert_script, source_merged_corpus, target_merged_corpus,
                                self._mert_i_script, runtime_moses_ini.name, '--threads',
                                str(multiprocessing.cpu_count()), '--mertdir', cli.BIN_DIR,
-                               '--mertargs', '\'--binary --sctype BLEU\'', '--working-dir', mert_wd, '--nbest', '100',
+                               '--mertargs', '\'--binary -t random-direction -m 16 --sctype BLEU\'', '--working-dir', mert_wd, '--nbest', '100',
                                '--decoder-flags', '"' + ' '.join(decoder_flags) + '"', '--nonorm', '--closest',
                                '--no-filter-phrase-table']
 
