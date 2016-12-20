@@ -1,4 +1,4 @@
-package eu.modernmt.datastream;
+package eu.modernmt.cluster.datastream;
 
 import eu.modernmt.io.DefaultCharset;
 import org.apache.kafka.common.serialization.Serializer;
@@ -24,11 +24,7 @@ public class StreamUpdateSerializer implements Serializer<StreamUpdate> {
 
         Charset charset = DefaultCharset.get();
 
-        byte flags = 0;
-        if (data.isFirst())
-            flags |= 0x02;
-        if (data.isLast())
-            flags |= 0x01;
+        byte flags = 0; // Reserved for future use
 
         int domain = data.getDomain();
         byte[] sourceSentence = data.getSourceSentence().getBytes(charset);
