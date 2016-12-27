@@ -159,11 +159,8 @@ NGramStorage::NGramStorage(string basepath, uint8_t order, size_t hugePageSize, 
 
     PlainTableOptions plainTableOptions;
     plainTableOptions.user_key_len = sizeof(domain_t) + sizeof(dbkey_t);
-
-    // huge pages
-    // see https://github.com/facebook/rocksdb/wiki/Allocating-Some-Indexes-and-Bloom-Filters-using-Huge-Page-TLB
-    //options.memtable_huge_page_size = hugePageSize; // new name
-    options.memtable_prefix_bloom_huge_page_tlb_size = hugePageSize; // old name
+ 
+    options.memtable_huge_page_size = hugePageSize;
     plainTableOptions.huge_page_tlb_size = hugePageSize;
     options.memtable_factory.reset(NewHashLinkListRepFactory(50000, hugePageSize));
 
@@ -173,7 +170,7 @@ NGramStorage::NGramStorage(string basepath, uint8_t order, size_t hugePageSize, 
 
     options.max_open_files = -1;
     options.compaction_style = kCompactionStyleLevel;
-    options.memtable_prefix_bloom_bits = 1024 * 1024 * 8;
+    options.memtable_prefix_bloom_size_ratio = 1.;
 
 
     if (prepareForBulkLoad) {
