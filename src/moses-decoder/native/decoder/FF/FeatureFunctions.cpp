@@ -27,8 +27,7 @@ using namespace mmt::logging;
 
 namespace Moses2 {
     FeatureFunctions::FeatureFunctions(System &system) :
-            m_system(system), m_ffStartInd(0) {
-        logger = Logger::Get("decoder.FeatureFunctionsManager");
+            m_system(system), m_ffStartInd(0), logger("decoder.FeatureFunctionsManager") {
         //m_registry.PrintFF();
     }
 
@@ -53,7 +52,7 @@ namespace Moses2 {
         load_order.insert(load_order.begin(), pt_ff.begin(), pt_ff.end());
 
         for (FeatureFunction *ff : load_order) {
-            logger->_Log(Level::INFO) << "Ciao";
+            LogInfo(logger) << "Questo è " << 11;
             Log(INFO, "Loading " << ff->GetName());
             Moses2::Timer timer;
             timer.start();

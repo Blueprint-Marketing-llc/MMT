@@ -101,7 +101,7 @@ namespace Moses2 {
         void ShowWeights(const Weights &allWeights);
 
     protected:
-        mmt::logging::Logger *logger;
+        mmt::logging::Logger logger;
 
         std::vector<const FeatureFunction *> m_featureFunctions;
         std::vector<const StatefulFeatureFunction *> m_statefulFeatureFunctions;
