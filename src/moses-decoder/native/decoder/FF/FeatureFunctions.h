@@ -12,96 +12,112 @@
 #include "../legacy/Parameter.h"
 #include "FeatureRegistry.h"
 #include "../Phrase.h"
+#include <mmt/logging/Logger.h>
 
-namespace Moses2
-{
-template<typename WORD>
-class TargetPhrase;
+namespace Moses2 {
+    template<typename WORD>
+    class TargetPhrase;
 
-class System;
-class FeatureFunction;
-class StatefulFeatureFunction;
-class PhraseTable;
-class Manager;
-class MemPool;
-class PhraseImpl;
-class TargetPhrases;
-class TargetPhraseImpl;
-class Scores;
-class Hypothesis;
-class UnknownWordPenalty;
-class Weights;
+    class System;
 
-namespace SCFG
-{
-class TargetPhraseImpl;
-class TargetPhrases;
-class Word;
-}
+    class FeatureFunction;
 
-class FeatureFunctions
-{
-public:
-  std::vector<const PhraseTable*> m_phraseTables;
+    class StatefulFeatureFunction;
 
-  FeatureFunctions(System &system);
-  virtual ~FeatureFunctions();
+    class PhraseTable;
 
-  const std::vector<const FeatureFunction*> &GetFeatureFunctions() const
-  { return m_featureFunctions; }
+    class Manager;
 
-  const std::vector<const StatefulFeatureFunction*> &GetStatefulFeatureFunctions() const
-  { return m_statefulFeatureFunctions; }
+    class MemPool;
 
-  const std::vector<const FeatureFunction*> &GetWithPhraseTableInd() const
-  { return m_withPhraseTableInd; }
+    class PhraseImpl;
 
-  size_t GetNumScores() const
-  { return m_ffStartInd; }
+    class TargetPhrases;
 
-  void Create();
-  void Load();
+    class TargetPhraseImpl;
 
-  const FeatureFunction *FindFeatureFunction(const std::string &name) const;
+    class Scores;
 
-  const PhraseTable *GetPhraseTableExcludeUnknownWordPenalty(size_t ptInd);
-  const UnknownWordPenalty *GetUnknownWordPenalty() const
-  { return m_unkWP; }
+    class Hypothesis;
 
-  // the pool here must be the system pool if the rule was loaded during load, or the mgr pool if it was loaded on demand
-  void EvaluateInIsolation(MemPool &pool, const System &system,
-      const Phrase<Moses2::Word> &source, TargetPhraseImpl &targetPhrase) const;
-  void EvaluateInIsolation(MemPool &pool, const System &system,
-      const Phrase<SCFG::Word> &source, SCFG::TargetPhraseImpl &targetPhrase) const;
+    class UnknownWordPenalty;
 
-  void EvaluateAfterTablePruning(MemPool &pool, const TargetPhrases &tps,
-      const Phrase<Moses2::Word> &sourcePhrase) const;
-  void EvaluateAfterTablePruning(MemPool &pool, const SCFG::TargetPhrases &tps,
-      const Phrase<SCFG::Word> &sourcePhrase) const;
+    class Weights;
 
-  void EvaluateWhenAppliedBatch(const Batch &batch) const;
+    namespace SCFG {
+        class TargetPhraseImpl;
 
-  void InitializeForInput(const Manager &mgr) const;
+        class TargetPhrases;
 
-  void CleanUpAfterSentenceProcessing() const;
+        class Word;
+    }
 
-  void ShowWeights(const Weights &allWeights);
+    class FeatureFunctions {
+    public:
+        std::vector<const PhraseTable *> m_phraseTables;
 
-protected:
-  std::vector<const FeatureFunction*> m_featureFunctions;
-  std::vector<const StatefulFeatureFunction*> m_statefulFeatureFunctions;
-  std::vector<const FeatureFunction*> m_withPhraseTableInd;
-  const UnknownWordPenalty *m_unkWP;
+        FeatureFunctions(System &system);
 
-  boost::unordered_map<std::string, size_t> m_defaultNames;
-  System &m_system;
-  size_t m_ffStartInd;
+        virtual ~FeatureFunctions();
 
-  FeatureFunction *Create(const std::string &line);
-  std::string GetDefaultName(const std::string &stub);
+        const std::vector<const FeatureFunction *> &GetFeatureFunctions() const { return m_featureFunctions; }
 
-  FeatureRegistry m_registry;
-};
+        const std::vector<const StatefulFeatureFunction *> &
+        GetStatefulFeatureFunctions() const { return m_statefulFeatureFunctions; }
+
+        const std::vector<const FeatureFunction *> &GetWithPhraseTableInd() const { return m_withPhraseTableInd; }
+
+        size_t GetNumScores() const { return m_ffStartInd; }
+
+        void Create();
+
+        void Load();
+
+        const FeatureFunction *FindFeatureFunction(const std::string &name) const;
+
+        const PhraseTable *GetPhraseTableExcludeUnknownWordPenalty(size_t ptInd);
+
+        const UnknownWordPenalty *GetUnknownWordPenalty() const { return m_unkWP; }
+
+        // the pool here must be the system pool if the rule was loaded during load, or the mgr pool if it was loaded on demand
+        void EvaluateInIsolation(MemPool &pool, const System &system,
+                                 const Phrase<Moses2::Word> &source, TargetPhraseImpl &targetPhrase) const;
+
+        void EvaluateInIsolation(MemPool &pool, const System &system,
+                                 const Phrase<SCFG::Word> &source, SCFG::TargetPhraseImpl &targetPhrase) const;
+
+        void EvaluateAfterTablePruning(MemPool &pool, const TargetPhrases &tps,
+                                       const Phrase<Moses2::Word> &sourcePhrase) const;
+
+        void EvaluateAfterTablePruning(MemPool &pool, const SCFG::TargetPhrases &tps,
+                                       const Phrase<SCFG::Word> &sourcePhrase) const;
+
+        void EvaluateWhenAppliedBatch(const Batch &batch) const;
+
+        void InitializeForInput(const Manager &mgr) const;
+
+        void CleanUpAfterSentenceProcessing() const;
+
+        void ShowWeights(const Weights &allWeights);
+
+    protected:
+        mmt::logging::Logger *logger;
+
+        std::vector<const FeatureFunction *> m_featureFunctions;
+        std::vector<const StatefulFeatureFunction *> m_statefulFeatureFunctions;
+        std::vector<const FeatureFunction *> m_withPhraseTableInd;
+        const UnknownWordPenalty *m_unkWP;
+
+        boost::unordered_map<std::string, size_t> m_defaultNames;
+        System &m_system;
+        size_t m_ffStartInd;
+
+        FeatureFunction *Create(const std::string &line);
+
+        std::string GetDefaultName(const std::string &stub);
+
+        FeatureRegistry m_registry;
+    };
 
 }
 

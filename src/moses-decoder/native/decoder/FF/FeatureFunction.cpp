@@ -25,6 +25,7 @@ FeatureFunction::FeatureFunction(size_t startInd, const std::string &line)
 ,m_tuneable(true)
 {
   ParseLine(line);
+
   //cerr << GetName() << " " << m_startInd << "-" << (m_startInd + m_numScores - 1) << endl;
 }
 
