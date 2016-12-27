@@ -9,7 +9,7 @@
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "../MemPool.h"
 #include "TranslationTask.h"
-#include <mmt/logging/Log.h>
+#include <mmt/logging/Logger.h>
 
 #include <boost/lexical_cast.hpp>
 #include <algorithm>

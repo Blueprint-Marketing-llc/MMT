@@ -31,7 +31,7 @@ void batch_run(MosesDecoder *decoder) {
 
   vector<string> translations;
   translations.resize(lines.size());
-  thread threads[lines.size()];
+  vector<thread> threads(lines.size());
 
   size_t i = 0;
   size_t nthreads = 8;

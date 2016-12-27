@@ -19,7 +19,7 @@
 #include "util/exception.hh"
 #include "util/usage.hh"
 #include "../legacy/Timer.h"
-#include <mmt/logging/Log.h>
+#include <mmt/logging/Logger.h>
 
 using namespace std;
 

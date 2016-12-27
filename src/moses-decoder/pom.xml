@@ -83,18 +83,10 @@
                             <executable>cmake</executable>
                             <workingDirectory>${project.build.native}</workingDirectory>
                             <arguments>
-<!--                                <argument>-DMMT_INCLUDE_DIR=${project.native.include}</argument>-->
+                                <argument>-DCMAKE_MODULE_PATH=${mmt.root}/src/cmake_modules</argument>
                                 <argument>-DCMAKE_BUILD_TYPE=Release</argument>
                                 <argument>-DCMAKE_INSTALL_PREFIX=${mmt.build}</argument>
                                 <argument>-Wno-dev</argument>
-
-                                <argument>-DMMT_ROOT=${mmt.root}</argument>
-                                <argument>-DMMTILM_ROOT=${mmt.build}</argument>
-                                <argument>-DSAPT_ROOT=${mmt.build}</argument>
-                                <argument>-DROCKSDB_ROOT=${mmt.build}</argument>
-
-                                <argument>-DUSE_MMTILM=1</argument>
-                                <argument>-DUSE_SAPT=1</argument>
 
                                 <argument>${project.nativedir}</argument>
                             </arguments>

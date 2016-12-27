@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../PhraseBased/Manager.h"
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "TranslationTask.h"
-#include <mmt/logging/Log.h>
+#include <mmt/logging/Logger.h>
 
 #define ParseWord(w) (boost::lexical_cast<wid_t>((w)))
 

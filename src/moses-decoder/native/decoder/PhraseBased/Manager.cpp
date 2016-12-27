@@ -33,7 +33,7 @@
 #include "../legacy/Range.h"
 #include "../legacy/Timer.h"
 #include "../PhraseBased/TargetPhrases.h"
-#include <mmt/logging/Log.h>
+#include <mmt/logging/Logger.h>
 
 #include "../legacy/util/usage.hh"
 #include <boost/thread.hpp>

@@ -25,6 +25,13 @@
                 <configuration>
                     <filesets>
                         <fileset>
+                            <directory>${project.nativedir.javah}</directory>
+                            <includes>
+                                <include>**/*.h</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
                             <directory>${mmt.build.lib}</directory>
                             <includes>
                                 <include>*mmtc*</include>
@@ -40,6 +47,29 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.4.0</version>
                 <executions>
+
+                    <!-- Generate headers with javah -->
+                    <execution>
+                        <id>headers-generate</id>
+                        <phase>generate-sources</phase>
+
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+
+                        <configuration>
+                            <executable>javah</executable>
+                            <workingDirectory>${project.build.sourceDirectory}</workingDirectory>
+                            <arguments>
+                                <argument>-d</argument>
+                                <argument>${project.nativedir.javah}</argument>
+
+                                <!-- All native classes -->
+                                <argument>eu.modernmt.logging.NativeLogger</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+
                     <!-- Run CMake to generate makefile -->
                     <execution>
                         <id>cmake-generate</id>
@@ -53,12 +83,9 @@
                             <executable>cmake</executable>
                             <workingDirectory>${project.build.native}</workingDirectory>
                             <arguments>
-<!--                                <argument>-DMMT_INCLUDE_DIR=${project.native.include}</argument>-->
+                                <argument>-DCMAKE_MODULE_PATH=${mmt.root}/src/cmake_modules</argument>
                                 <argument>-DCMAKE_BUILD_TYPE=Release</argument>
                                 <argument>-DCMAKE_INSTALL_PREFIX=${mmt.build}</argument>
-                                <argument>-Wno-dev</argument>
-
-                                <argument>-DMMT_ROOT=${mmt.root}</argument>
 
                                 <argument>${project.nativedir}</argument>
                             </arguments>
