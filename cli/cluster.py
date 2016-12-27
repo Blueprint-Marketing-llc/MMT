@@ -127,22 +127,22 @@ class MMTApi:
 
         return self._get('translate', params=p)
 
-    def create_domain(self, tmx=None, source_file=None, target_file=None, name=None):
-        if source_file is not None and target_file is not None:
-            params = {'source_local_file': source_file, 'target_local_file': target_file}
-        elif tmx is not None:
-            params = {'tmx_local_file': tmx}
-        else:
-            raise IllegalArgumentException('missing corpus for domain')
-
-        if name is not None:
-            params['name'] = name
-
+    def create_domain(self, name):
+        params = {'name': name}
         return self._post('domains', params=params)
 
     def append_to_domain(self, domain, source, target):
         params = {'source': source, 'target': target}
         return self._put('domains/' + str(domain), params=params)
+
+    def import_into_domain(self, domain, tmx):
+        params = {
+            'domain': domain,
+            'content_type' : 'tmx',
+            'local_file' : tmx
+        }
+
+        return self._post('imports', params=params)
 
     def get_all_domains(self):
         return self._get('domains')
@@ -610,11 +610,14 @@ class ClusterNode(object):
             if not debug:
                 self.engine.clear_tempdir()
 
-    def new_domain_from_parallel(self, source_file, target_file, name=None):
-        return self.api.create_domain(source_file=source_file, target_file=target_file, name=name)
-
     def new_domain_from_tmx(self, tmx, name=None):
-        return self.api.create_domain(tmx=tmx, name=name)
+        if name is None:
+            name = os.path.basename(os.path.splitext(tmx)[0])
+
+        domain = self.api.create_domain(name)
+        self.api.import_into_domain(domain['id'], tmx)
+
+        return domain
 
     def append_to_domain(self, domain, source, target):
         try:
