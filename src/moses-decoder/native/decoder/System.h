@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 #include <vector>
 #include <deque>
 #include <boost/thread/tss.hpp>
@@ -21,77 +22,86 @@
 #include "legacy/Bitmaps.h"
 #include "legacy/OutputCollector.h"
 #include "parameters/AllOptions.h"
+#include <mmt/logging/Logger.h>
 
 namespace mmt {
-class Aligner;
-class Vocabulary;
+    class Aligner;
+
+    class Vocabulary;
 }
 
-namespace Moses2
-{
-namespace NSCubePruning
-{
-class Stack;
-}
+namespace Moses2 {
+    namespace NSCubePruning {
+        class Stack;
+    }
 
-class FeatureFunction;
-class StatefulFeatureFunction;
-class PhraseTable;
-class HypothesisBase;
+    class FeatureFunction;
 
-class System
-{
-public:
-  const Parameter &params;
-  AllOptions options;
-  FeatureFunctions featureFunctions;
-  std::vector<const PhraseTable*> mappings;
+    class StatefulFeatureFunction;
 
-  mmt::Aligner *aligner;
-  mmt::Vocabulary *vocabulary;
+    class PhraseTable;
 
-  std::vector<size_t> maxChartSpans;
-  bool isPb;
+    class HypothesisBase;
 
-  mutable boost::shared_ptr<OutputCollector> bestCollector, nbestCollector, detailedTranslationCollector;
+    class System {
+    public:
+        const Parameter &params;
+        AllOptions options;
+        FeatureFunctions featureFunctions;
+        std::vector<const PhraseTable *> mappings;
 
-  // moses.ini params
-  int cpuAffinityOffset;
-  int cpuAffinityOffsetIncr;
+        mmt::Aligner *aligner;
+        mmt::Vocabulary *vocabulary;
 
-  size_t verbose;
+        std::vector <size_t> maxChartSpans;
+        bool isPb;
 
-  System(const Parameter &paramsArg, mmt::Aligner *aligner = nullptr, mmt::Vocabulary *vocabulary = nullptr);
-  virtual ~System();
+        mutable boost::shared_ptr <OutputCollector> bestCollector, nbestCollector, detailedTranslationCollector;
 
-  MemPool &GetSystemPool() const;
-  MemPool &GetManagerPool() const;
-  FactorCollection &GetVocab() const;
+        // moses.ini params
+        int cpuAffinityOffset;
+        int cpuAffinityOffsetIncr;
 
-  Recycler<HypothesisBase*> &GetHypoRecycler() const;
+        size_t verbose;
 
-  Batch &GetBatch(MemPool &pool) const;
+        System(const Parameter &paramsArg, mmt::Aligner *aligner = nullptr, mmt::Vocabulary *vocabulary = nullptr);
 
-  const Weights &GetWeights() const { return weights; }
+        virtual ~System();
 
-protected:
-  mutable FactorCollection m_vocab;
-  mutable boost::thread_specific_ptr<MemPool> m_managerPool;
-  mutable boost::thread_specific_ptr<MemPool> m_systemPool;
+        MemPool &GetSystemPool() const;
 
-  mutable boost::thread_specific_ptr<Recycler<HypothesisBase*> > m_hypoRecycler;
+        MemPool &GetManagerPool() const;
 
-  mutable boost::thread_specific_ptr<Batch> m_batch;
+        FactorCollection &GetVocab() const;
 
-  void LoadWeights();
-  void LoadMappings();
-  void LoadDecodeGraphBackoff();
+        Recycler<HypothesisBase *> &GetHypoRecycler() const;
 
-  void IsPb();
+        Batch &GetBatch(MemPool &pool) const;
 
-private:
-  Weights weights;
-};
+        const Weights &GetWeights() const { return weights; }
+
+    protected:
+        const mmt::logging::Logger logger;
+
+        mutable FactorCollection m_vocab;
+        mutable boost::thread_specific_ptr <MemPool> m_managerPool;
+        mutable boost::thread_specific_ptr <MemPool> m_systemPool;
+
+        mutable boost::thread_specific_ptr <Recycler<HypothesisBase *>> m_hypoRecycler;
+
+        mutable boost::thread_specific_ptr <Batch> m_batch;
+
+        void LoadWeights();
+
+        void LoadMappings();
+
+        void LoadDecodeGraphBackoff();
+
+        void IsPb();
+
+    private:
+        Weights weights;
+    };
 
 }
 

@@ -31,9 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../FF/StatefulFeatureFunction.h"
 #include "../legacy/Factor.h"
-//#include "moses/Hypothesis.h"
-//#include "moses/TypeDef.h"
 #include "moses/Util.h"
+#include <mmt/logging/Logger.h>
 
 #ifdef WITH_THREADS
 
@@ -51,6 +50,8 @@ namespace Moses2 {
         typedef std::map<std::string, float> weightmap_t;
 
     protected:
+        const mmt::logging::Logger logger;
+
         InterpolatedLM *m_lm;
         string m_modelPath;
         mmt::ilm::Options lm_options;

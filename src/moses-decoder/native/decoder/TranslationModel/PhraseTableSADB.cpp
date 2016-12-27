@@ -9,7 +9,6 @@
 #include "../PhraseBased/TargetPhraseImpl.h"
 #include "../MemPool.h"
 #include "TranslationTask.h"
-#include <mmt/logging/Logger.h>
 
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
@@ -25,7 +24,7 @@ using namespace mmt::sapt;
 namespace Moses2 {
     //used the constant of mmt::sapt to get entries of the vector cnt,
     //used the cnstant of LRModel   for the probabilities
-    void fill_lr_vec2(LRModel::ModelType mdl, const vector<size_t> &cnt, const float total, float *v) {
+    void fill_lr_vec2(LRModel::ModelType mdl, const vector <size_t> &cnt, const float total, float *v) {
         if (mdl == LRModel::Monotonic) {
             float denom = log(total + 2);
             v[LRModel::M] = log(cnt[MonotonicOrientation] + 1.) - denom;
@@ -52,8 +51,8 @@ namespace Moses2 {
 
     void fill_lr_vec(LRModel::Direction const &dir,
                      LRModel::ModelType const &mdl,
-                     const vector<size_t> &dfwd,
-                     const vector<size_t> &dbwd,
+                     const vector <size_t> &dfwd,
+                     const vector <size_t> &dbwd,
                      vector<float> &v) {
         // how many distinct scores do we have?
         size_t num_scores = (mdl == LRModel::MSLR ? 4 : mdl == LRModel::MSD ? 3 : 2);
@@ -79,28 +78,30 @@ namespace Moses2 {
     }
 
     PhraseTableSADB::PhraseTableSADB(size_t startInd, const std::string &line)
-            : Moses2::PhraseTable(startInd, line), m_lr_func(nullptr) {
+            : Moses2::PhraseTable(startInd, line), m_lr_func(nullptr), logger("decoder.PhraseTableSADB") {
         this->m_numScores = mmt::sapt::kTranslationOptionScoreCount;
         ReadParameters();
 
         assert(m_input.size() == 1);
         assert(m_output.size() == 1);
 
-        Log(TRACE, GetName()
-                << " PhraseTableSADB::PhraseTableSADB() m_modelPath:|"
-                << m_modelPath << "|");
-        Log(TRACE, GetName()
-                << " PhraseTableSADB::PhraseTableSADB() table-limit:|"
-                << m_tableLimit << "|");
-        Log(TRACE, GetName()
-                << " PhraseTableSADB::PhraseTableSADB() cache-size:|"
-                << m_maxCacheSize << "|");
-        Log(TRACE, GetName()
-                << " PhraseTableSADB::PhraseTableSADB() m_numScores:|"
-                << m_numScores << "|");
-        Log(TRACE, GetName()
-                << " PhraseTableSADB::PhraseTableSADB() m_input.size():|"
-                << m_input.size() << "|");
+        if (logger.IsTraceEnabled()) {
+            LogTrace(logger) << GetName()
+                             << " PhraseTableSADB::PhraseTableSADB() m_modelPath:|"
+                             << m_modelPath << "|";
+            LogTrace(logger) << GetName()
+                             << " PhraseTableSADB::PhraseTableSADB() table-limit:|"
+                             << m_tableLimit << "|";
+            LogTrace(logger) << GetName()
+                             << " PhraseTableSADB::PhraseTableSADB() cache-size:|"
+                             << m_maxCacheSize << "|";
+            LogTrace(logger) << GetName()
+                             << " PhraseTableSADB::PhraseTableSADB() m_numScores:|"
+                             << m_numScores << "|";
+            LogTrace(logger) << GetName()
+                             << " PhraseTableSADB::PhraseTableSADB() m_input.size():|"
+                             << m_input.size() << "|";
+        }
 
         // caching for memory pt is pointless
         m_maxCacheSize = 0;
@@ -124,8 +125,8 @@ namespace Moses2 {
         delete m_pt;
     }
 
-    inline vector<wid_t> PhraseTableSADB::ParsePhrase(const SubPhrase<Moses2::Word> &phrase) const {
-        vector<wid_t> result(phrase.GetSize());
+    inline vector <wid_t> PhraseTableSADB::ParsePhrase(const SubPhrase<Moses2::Word> &phrase) const {
+        vector <wid_t> result(phrase.GetSize());
 
         for (size_t i = 0; i < phrase.GetSize(); i++) {
             result[i] = ParseWord(phrase[i].GetString(m_input));
@@ -136,18 +137,17 @@ namespace Moses2 {
 
     TargetPhrases *
     PhraseTableSADB::MakeTargetPhrases(const Manager &mgr, const Phrase<Moses2::Word> &sourcePhrase,
-                                       const vector<mmt::sapt::TranslationOption> &options) const
-    {
+                                       const vector <mmt::sapt::TranslationOption> &options) const {
         auto &pool = mgr.GetPool();
         FactorCollection &vocab = mgr.system.GetVocab();
-        TargetPhrases *tps = new (pool.Allocate<TargetPhrases>()) TargetPhrases(pool, options.size());
+        TargetPhrases *tps = new(pool.Allocate<TargetPhrases>()) TargetPhrases(pool, options.size());
 
         //transform the SAPT translation Options into Moses Target Phrases
         for (auto target_options_it = options.begin();
-             target_options_it != options.end(); ++target_options_it)
-        {
-            const vector<wid_t> &tpw = target_options_it->targetPhrase;
-            TargetPhraseImpl *tp = new (pool.Allocate<TargetPhraseImpl>()) TargetPhraseImpl(pool, *this, mgr.system, tpw.size());
+             target_options_it != options.end(); ++target_options_it) {
+            const vector <wid_t> &tpw = target_options_it->targetPhrase;
+            TargetPhraseImpl *tp = new(pool.Allocate<TargetPhraseImpl>()) TargetPhraseImpl(pool, *this, mgr.system,
+                                                                                           tpw.size());
 
             // words
             for (size_t i = 0; i < tpw.size(); i++) {
@@ -156,10 +156,9 @@ namespace Moses2 {
             }
 
             // align
-            std::set<std::pair<size_t, size_t> > aln;
+            std::set <std::pair<size_t, size_t>> aln;
             for (auto alignment_it = target_options_it->alignment.begin();
-                 alignment_it != target_options_it->alignment.end(); ++alignment_it)
-            {
+                 alignment_it != target_options_it->alignment.end(); ++alignment_it) {
                 aln.insert(std::make_pair(size_t(alignment_it->first), size_t(alignment_it->second)));
             }
             tp->SetAlignTerm(aln);
@@ -189,39 +188,37 @@ namespace Moses2 {
     }
 
     void PhraseTableSADB::SetParameter(const std::string &key, const std::string &value) {
-
         if (key == "path") {
             m_modelPath = Scan<std::string>(value);
-            Log(TRACE, "m_modelPath:" << m_modelPath);
+            LogTrace(logger) << "m_modelPath:" << m_modelPath;
         } else if (key == "sample-limit") {
             pt_options.samples = Scan<int>(value);
-            Log(TRACE, "pt_options.sample:" << pt_options.samples);
-        } else if(key == "lr-func") {
+            LogTrace(logger) << "pt_options.sample:" << pt_options.samples;
+        } else if (key == "lr-func") {
             m_lr_func_name = Scan<std::string>(value);
         } else {
             PhraseTable::SetParameter(key, value);
         }
     }
 
-    void PhraseTableSADB::Lookup(const Manager &mgr, InputPathsBase &inputPaths) const
-    {
+    void PhraseTableSADB::Lookup(const Manager &mgr, InputPathsBase &inputPaths) const {
         auto &sent = dynamic_cast<const Sentence &>(mgr.GetInput());
         SubPhrase<Moses2::Word> sourceSentence = sent.GetSubPhrase(0, sent.GetSize());
 
         context_t *context = t_context_vec.get();
 
-        vector<wid_t> sentence = ParsePhrase(sourceSentence);
+        vector <wid_t> sentence = ParsePhrase(sourceSentence);
         mmt::sapt::translation_table_t ttable = m_pt->GetAllTranslationOptions(sentence, context);
 
-        for(InputPathBase *pathBase : inputPaths) {
-          InputPath *path = static_cast<InputPath*>(pathBase);
-          vector<wid_t> phrase = ParsePhrase(path->subPhrase);
+        for (InputPathBase *pathBase : inputPaths) {
+            InputPath *path = static_cast<InputPath *>(pathBase);
+            vector <wid_t> phrase = ParsePhrase(path->subPhrase);
 
-          auto options = ttable.find(phrase);
-          if (options != ttable.end()) {
-            auto tps = MakeTargetPhrases(mgr, path->subPhrase, options->second);
-            path->AddTargetPhrases(*this, tps);
-          }
+            auto options = ttable.find(phrase);
+            if (options != ttable.end()) {
+                auto tps = MakeTargetPhrases(mgr, path->subPhrase, options->second);
+                path->AddTargetPhrases(*this, tps);
+            }
         }
     }
 
@@ -256,8 +253,7 @@ namespace Moses2 {
     }
 
     TargetPhrases *PhraseTableSADB::Lookup(const Manager &mgr, MemPool &pool,
-        InputPath &inputPath) const
-    {
+                                           InputPath &inputPath) const {
         // performance wise, this is not wise.
         // Instead, use Lookup(InputPathsBase &) for a whole sentence at a time.
         UTIL_THROW2("Not implemented");
@@ -266,32 +262,29 @@ namespace Moses2 {
 
     // scfg
     void PhraseTableSADB::InitActiveChart(
-        MemPool &pool,
-        const SCFG::Manager &mgr,
-        SCFG::InputPath &path) const
-    {
+            MemPool &pool,
+            const SCFG::Manager &mgr,
+            SCFG::InputPath &path) const {
         UTIL_THROW2("Not implemented");
     }
 
     void PhraseTableSADB::Lookup(
-        MemPool &pool,
-        const SCFG::Manager &mgr,
-        size_t maxChartSpan,
-        const SCFG::Stacks &stacks,
-        SCFG::InputPath &path) const
-    {
+            MemPool &pool,
+            const SCFG::Manager &mgr,
+            size_t maxChartSpan,
+            const SCFG::Stacks &stacks,
+            SCFG::InputPath &path) const {
         UTIL_THROW2("Not implemented");
     }
 
     void PhraseTableSADB::LookupGivenNode(
-        MemPool &pool,
-        const SCFG::Manager &mgr,
-        const SCFG::ActiveChartEntry &prevEntry,
-        const SCFG::Word &wordSought,
-        const Moses2::Hypotheses *hypos,
-        const Moses2::Range &subPhraseRange,
-        SCFG::InputPath &outPath) const
-    {
+            MemPool &pool,
+            const SCFG::Manager &mgr,
+            const SCFG::ActiveChartEntry &prevEntry,
+            const SCFG::Word &wordSought,
+            const Moses2::Hypotheses *hypos,
+            const Moses2::Range &subPhraseRange,
+            SCFG::InputPath &outPath) const {
         UTIL_THROW2("Not implemented");
     }
 

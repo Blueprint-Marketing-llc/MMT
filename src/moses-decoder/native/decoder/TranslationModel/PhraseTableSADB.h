@@ -13,6 +13,7 @@
 #include <mmt/IncrementalModel.h>
 #include "moses/TypeDef.h"
 #include "moses/Util.h"
+#include <mmt/logging/Logger.h>
 
 
 #ifdef WITH_THREADS
@@ -26,9 +27,13 @@ namespace Moses2 {
     using namespace mmt::sapt;
 
     class ChartParser;
+
     class ChartCellCollectionBase;
+
     class ChartRuleLookupManager;
+
     class TargetPhrases;
+
     class LexicalReordering;
 
     class PhraseTableSADB : public Moses2::PhraseTable {
@@ -52,6 +57,7 @@ namespace Moses2 {
         }
 
         virtual void InitializeForInput(const Manager &mgr) const override;
+
         void InitializeForInput(const Manager &mgr);
 
         virtual TargetPhrases *Lookup(const Manager &mgr, MemPool &pool,
@@ -59,18 +65,18 @@ namespace Moses2 {
 
         // scfg
         virtual void InitActiveChart(
-            MemPool &pool,
-            const SCFG::Manager &mgr,
-            SCFG::InputPath &path) const override;
+                MemPool &pool,
+                const SCFG::Manager &mgr,
+                SCFG::InputPath &path) const override;
 
         virtual void Lookup(const Manager &mgr, InputPathsBase &inputPaths) const override;
 
         virtual void Lookup(
-            MemPool &pool,
-            const SCFG::Manager &mgr,
-            size_t maxChartSpan,
-            const SCFG::Stacks &stacks,
-            SCFG::InputPath &path) const override;
+                MemPool &pool,
+                const SCFG::Manager &mgr,
+                size_t maxChartSpan,
+                const SCFG::Stacks &stacks,
+                SCFG::InputPath &path) const override;
 
 
     protected:
@@ -79,32 +85,33 @@ namespace Moses2 {
         //boost::thread_specific_ptr<void> m_ttask;
         boost::thread_specific_ptr<context_t> t_context_vec;
 #else
-        boost::scoped_ptr<context_t> *t_context_vec;
+        boost::scoped_ptr <context_t> *t_context_vec;
 #endif
 
         // SCFG
         virtual void LookupGivenNode(
-            MemPool &pool,
-            const SCFG::Manager &mgr,
-            const SCFG::ActiveChartEntry &prevEntry,
-            const SCFG::Word &wordSought,
-            const Moses2::Hypotheses *hypos,
-            const Moses2::Range &subPhraseRange,
-            SCFG::InputPath &outPath) const override;
+                MemPool &pool,
+                const SCFG::Manager &mgr,
+                const SCFG::ActiveChartEntry &prevEntry,
+                const SCFG::Word &wordSought,
+                const Moses2::Hypotheses *hypos,
+                const Moses2::Range &subPhraseRange,
+                SCFG::InputPath &outPath) const override;
 
     private:
+        mmt::logging::Logger logger;
         mmt::sapt::PhraseTable *m_pt;
         string m_modelPath;
         mmt::sapt::Options pt_options;
 
-        const LexicalReordering* m_lr_func; // associated lexical reordering function
+        const LexicalReordering *m_lr_func; // associated lexical reordering function
         std::string m_lr_func_name; // name of associated lexical reordering function
 
-        inline vector<wid_t> ParsePhrase(const SubPhrase<Moses2::Word> &subPhrase) const;
+        inline vector <wid_t> ParsePhrase(const SubPhrase<Moses2::Word> &subPhrase) const;
 
         TargetPhrases *
         MakeTargetPhrases(const Manager &mgr, const Phrase<Moses2::Word> &sourcePhrase,
-                          const vector<mmt::sapt::TranslationOption> &options) const;
+                          const vector <mmt::sapt::TranslationOption> &options) const;
     };
 
 } // namespace Moses

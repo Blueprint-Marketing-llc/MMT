@@ -14,200 +14,187 @@
 #include "TranslationModel/UnknownWordPenalty.h"
 #include "legacy/Util2.h"
 #include "util/exception.hh"
-#include <mmt/logging/Logger.h>
 
 using namespace std;
 
-namespace Moses2
-{
+namespace Moses2 {
 
-System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *vocab) :
-    params(paramsArg), featureFunctions(*this),
-    aligner(aln), vocabulary(vocab)
-{
-  options.init(paramsArg);
-  IsPb();
+    System::System(const Parameter &paramsArg, mmt::Aligner *aln, mmt::Vocabulary *vocab) :
+            params(paramsArg), featureFunctions(*this),
+            aligner(aln), vocabulary(vocab), logger("decoder.System") {
+        options.init(paramsArg);
+        IsPb();
 
-  bestCollector.reset(new OutputCollector());
+        bestCollector.reset(new OutputCollector());
 
-  params.SetParameter(cpuAffinityOffset, "cpu-affinity-offset", -1);
-  params.SetParameter(cpuAffinityOffsetIncr, "cpu-affinity-increment", 1);
+        params.SetParameter(cpuAffinityOffset, "cpu-affinity-offset", -1);
+        params.SetParameter(cpuAffinityOffsetIncr, "cpu-affinity-increment", 1);
 
-  params.SetParameter(verbose, "verbose", (size_t) 0);
+        params.SetParameter(verbose, "verbose", (size_t) 0);
 
-  const PARAM_VEC *section;
+        const PARAM_VEC *section;
 
-  // output collectors
-  if (options.nbest.nbest_size && options.nbest.output_file_path.size()) {
-    nbestCollector.reset(new OutputCollector(options.nbest.output_file_path));
-  }
+        // output collectors
+        if (options.nbest.nbest_size && options.nbest.output_file_path.size()) {
+            nbestCollector.reset(new OutputCollector(options.nbest.output_file_path));
+        }
 
-  if (!options.output.detailed_transrep_filepath.empty()) {
-	  detailedTranslationCollector.reset(new OutputCollector(options.output.detailed_transrep_filepath));
-  }
+        if (!options.output.detailed_transrep_filepath.empty()) {
+            detailedTranslationCollector.reset(new OutputCollector(options.output.detailed_transrep_filepath));
+        }
 
-  featureFunctions.Create();
-  LoadWeights();
+        featureFunctions.Create();
+        LoadWeights();
 
-  if (params.GetParam("show-weights")) {
-    cerr << "Showing weights then exit" << endl;
-    featureFunctions.ShowWeights(weights);
-    //return;
-  }
+        if (params.GetParam("show-weights")) {
+            cerr << "Showing weights then exit" << endl;
+            featureFunctions.ShowWeights(weights);
+            //return;
+        }
 
-  Log(INFO, "START featureFunctions.Load()");
-  featureFunctions.Load();
-  Log(INFO, "START LoadMappings()");
-  LoadMappings();
-  Log(INFO, "END LoadMappings()");
-  LoadDecodeGraphBackoff();
-  Log(INFO, "END LoadDecodeGraphBackoff()");
 
-  UTIL_THROW_IF2(options.input.xml_policy == XmlConstraint, "XmlConstraint not supported");
+        LogInfo(logger) << "START featureFunctions.Load()";
+        featureFunctions.Load();
+        LogInfo(logger) << "START LoadMappings()";
+        LoadMappings();
+        LogInfo(logger) << "END LoadMappings()";
+        LoadDecodeGraphBackoff();
+        LogInfo(logger) << "END LoadDecodeGraphBackoff()";
 
-  // max spans for scfg decoding
-  if (!isPb) {
-    section = params.GetParam("max-chart-span");
-    if (section && section->size()) {
-      maxChartSpans = Scan<size_t>(*section);
-      maxChartSpans.resize(mappings.size(), DEFAULT_MAX_CHART_SPAN);
+        UTIL_THROW_IF2(options.input.xml_policy == XmlConstraint, "XmlConstraint not supported");
 
-      /*
-      cerr << "maxChartSpans=" << maxChartSpans.size();
-      for (size_t i = 0; i < maxChartSpans.size(); ++i) {
-          cerr << " " << mappings[i]->GetName() << "=" << maxChartSpans[i];
-      }
-      cerr << endl;
-      */
+        // max spans for scfg decoding
+        if (!isPb) {
+            section = params.GetParam("max-chart-span");
+            if (section && section->size()) {
+                maxChartSpans = Scan<size_t>(*section);
+                maxChartSpans.resize(mappings.size(), DEFAULT_MAX_CHART_SPAN);
+
+                /*
+                cerr << "maxChartSpans=" << maxChartSpans.size();
+                for (size_t i = 0; i < maxChartSpans.size(); ++i) {
+                    cerr << " " << mappings[i]->GetName() << "=" << maxChartSpans[i];
+                }
+                cerr << endl;
+                */
+            }
+        }
+
     }
-  }
 
-}
+    System::~System() {
+    }
 
-System::~System()
-{
-}
+    void System::LoadWeights() {
+        weights.Init(featureFunctions);
 
-void System::LoadWeights()
-{
-  weights.Init(featureFunctions);
+        //cerr << "Weights:" << endl;
+        typedef std::map <std::string, std::vector<float>> WeightMap;
+        const WeightMap &allWeights = params.GetAllWeights();
+        BOOST_FOREACH(
+        const WeightMap::value_type &valPair, allWeights) {
+            const string &ffName = valPair.first;
+            const std::vector<float> &ffWeights = valPair.second;
+            /*
+            cerr << ffName << "=";
+            for (size_t i = 0; i < ffWeights.size(); ++i) {
+                cerr << ffWeights[i] << " ";
+            }
+            cerr << endl;
+            */
+            weights.SetWeights(featureFunctions, ffName, ffWeights);
+        }
+    }
 
-  //cerr << "Weights:" << endl;
-  typedef std::map<std::string, std::vector<float> > WeightMap;
-  const WeightMap &allWeights = params.GetAllWeights();
-  BOOST_FOREACH(const WeightMap::value_type &valPair, allWeights) {
-	  const string &ffName = valPair.first;
-	  const std::vector<float> &ffWeights = valPair.second;
-	  /*
-	  cerr << ffName << "=";
-	  for (size_t i = 0; i < ffWeights.size(); ++i) {
-		  cerr << ffWeights[i] << " ";
-	  }
-	  cerr << endl;
-	  */
-	  weights.SetWeights(featureFunctions, ffName, ffWeights);
-  }
-}
+    void System::LoadMappings() {
+        const PARAM_VEC *vec = params.GetParam("mapping");
+        UTIL_THROW_IF2(vec == NULL, "Must have [mapping] section");
 
-void System::LoadMappings()
-{
-  const PARAM_VEC *vec = params.GetParam("mapping");
-  UTIL_THROW_IF2(vec == NULL, "Must have [mapping] section");
+        BOOST_FOREACH(
+        const std::string &line, *vec){
+            vector <string> toks = Tokenize(line);
+            assert((toks.size() == 2 && toks[0] == "T") || (toks.size() == 3 && toks[1] == "T"));
 
-  BOOST_FOREACH(const std::string &line, *vec){
-  vector<string> toks = Tokenize(line);
-  assert( (toks.size() == 2 && toks[0] == "T") || (toks.size() == 3 && toks[1] == "T") );
-
-  size_t ptInd;
-  if (toks.size() == 2) {
-    ptInd = Scan<size_t>(toks[1]);
-  }
-  else {
-    ptInd = Scan<size_t>(toks[2]);
-  }
-  const PhraseTable *pt = featureFunctions.GetPhraseTableExcludeUnknownWordPenalty(ptInd);
-  mappings.push_back(pt);
-}
+            size_t ptInd;
+            if (toks.size() == 2) {
+                ptInd = Scan<size_t>(toks[1]);
+            } else {
+                ptInd = Scan<size_t>(toks[2]);
+            }
+            const PhraseTable *pt = featureFunctions.GetPhraseTableExcludeUnknownWordPenalty(ptInd);
+            mappings.push_back(pt);
+        }
 
 // unk pt
-  const UnknownWordPenalty *unkWP = featureFunctions.GetUnknownWordPenalty();
-  if (unkWP) {
-    mappings.push_back(unkWP);
-  }
-}
+        const UnknownWordPenalty *unkWP = featureFunctions.GetUnknownWordPenalty();
+        if (unkWP) {
+            mappings.push_back(unkWP);
+        }
+    }
 
-void System::LoadDecodeGraphBackoff()
-{
-  const PARAM_VEC *vec = params.GetParam("decoding-graph-backoff");
+    void System::LoadDecodeGraphBackoff() {
+        const PARAM_VEC *vec = params.GetParam("decoding-graph-backoff");
 
-  for (size_t i = 0; i < mappings.size(); ++i) {
-	  PhraseTable *pt = const_cast<PhraseTable*>(mappings[i]);
+        for (size_t i = 0; i < mappings.size(); ++i) {
+            PhraseTable *pt = const_cast<PhraseTable *>(mappings[i]);
 
-	  if (vec && vec->size() < i) {
-		  pt->decodeGraphBackoff = Scan<int>((*vec)[i]);
-	  }
-	  else if (pt == featureFunctions.GetUnknownWordPenalty()) {
-		  pt->decodeGraphBackoff = 1;
-	  }
-	  else {
-		  pt->decodeGraphBackoff = 0;
-	  }
-  }
-}
+            if (vec && vec->size() < i) {
+                pt->decodeGraphBackoff = Scan<int>((*vec)[i]);
+            } else if (pt == featureFunctions.GetUnknownWordPenalty()) {
+                pt->decodeGraphBackoff = 1;
+            } else {
+                pt->decodeGraphBackoff = 0;
+            }
+        }
+    }
 
-MemPool &System::GetSystemPool() const
-{
-  return GetThreadSpecificObj(m_systemPool);
-}
+    MemPool &System::GetSystemPool() const {
+        return GetThreadSpecificObj(m_systemPool);
+    }
 
-MemPool &System::GetManagerPool() const
-{
-  return GetThreadSpecificObj(m_managerPool);
-}
+    MemPool &System::GetManagerPool() const {
+        return GetThreadSpecificObj(m_managerPool);
+    }
 
-FactorCollection &System::GetVocab() const
-{
-  return m_vocab;
-}
+    FactorCollection &System::GetVocab() const {
+        return m_vocab;
+    }
 
-Recycler<HypothesisBase*> &System::GetHypoRecycler() const
-{
-  return GetThreadSpecificObj(m_hypoRecycler);
-}
+    Recycler<HypothesisBase *> &System::GetHypoRecycler() const {
+        return GetThreadSpecificObj(m_hypoRecycler);
+    }
 
-Batch &System::GetBatch(MemPool &pool) const
-{
-  Batch *obj;
-  obj = m_batch.get();
-  if (obj == NULL) {
-    obj = new Batch(pool);
-    m_batch.reset(obj);
-  }
-  assert(obj);
-  return *obj;
-}
+    Batch &System::GetBatch(MemPool &pool) const {
+        Batch *obj;
+        obj = m_batch.get();
+        if (obj == NULL) {
+            obj = new Batch(pool);
+            m_batch.reset(obj);
+        }
+        assert(obj);
+        return *obj;
+    }
 
-void System::IsPb()
-{
-  switch (options.search.algo) {
-  case Normal:
-  case NormalBatch:
-  case CubePruning:
-  case CubePruningPerMiniStack:
-  case CubePruningPerBitmap:
-  case CubePruningCardinalStack:
-  case CubePruningBitmapStack:
-  case CubePruningMiniStack:
-    isPb = true;
-    break;
-  case CYKPlus:
-    isPb = false;
-    break;
-  default:
-    abort();
-    break;
-  }
-}
+    void System::IsPb() {
+        switch (options.search.algo) {
+            case Normal:
+            case NormalBatch:
+            case CubePruning:
+            case CubePruningPerMiniStack:
+            case CubePruningPerBitmap:
+            case CubePruningCardinalStack:
+            case CubePruningBitmapStack:
+            case CubePruningMiniStack:
+                isPb = true;
+                break;
+            case CYKPlus:
+                isPb = false;
+                break;
+            default:
+                abort();
+                break;
+        }
+    }
 
 
 }

@@ -19,61 +19,71 @@
 #include "../EstimatedScores.h"
 #include "../legacy/Bitmaps.h"
 #include "InputPaths.h"
+#include <mmt/logging/Logger.h>
 
-namespace Moses2
-{
+namespace Moses2 {
 
-class System;
-class TranslationTask;
-class PhraseImpl;
-class TargetPhraseImpl;
-class SearchNormal;
-class Search;
-class Hypothesis;
-class Sentence;
-class OutputCollector;
+    class System;
 
-class Manager: public ManagerBase
-{
-public:
-  Manager(System &sys, const TranslationTask &task, const std::string &inputStr,
-      long translationId);
+    class TranslationTask;
 
-  virtual ~Manager();
+    class PhraseImpl;
 
-  Bitmaps &GetBitmaps()
-  {  return *m_bitmaps; }
+    class TargetPhraseImpl;
 
-  const EstimatedScores &GetEstimatedScores() const
-  {  return *m_estimatedScores; }
+    class SearchNormal;
 
-  const InputPaths &GetInputPaths() const
-  {  return m_inputPaths; }
+    class Search;
 
-  const TargetPhraseImpl &GetInitPhrase() const
-  {  return *m_initPhrase; }
+    class Hypothesis;
 
-  void Decode();
-  std::string OutputBest() const;
-  std::string OutputNBest();
-  virtual void OutputNBest(size_t nbest_size, std::vector<ResponseHypothesis> &nbest) const override;
-  std::string OutputTransOpt();
-  virtual void OutputAlignment(std::vector<std::pair<size_t, size_t>> &alignment) const override;
+    class Sentence;
 
-protected:
+    class OutputCollector;
 
-  InputPaths m_inputPaths;
-  Bitmaps *m_bitmaps;
-  EstimatedScores *m_estimatedScores;
-  TargetPhraseImpl *m_initPhrase;
+    class Manager : public ManagerBase {
+    public:
+        Manager(System &sys, const TranslationTask &task, const std::string &inputStr,
+                long translationId);
 
-  Search *m_search;
+        virtual ~Manager();
 
-  // must be run in same thread as Decode()
-  void Init();
-  void CalcFutureScore();
+        Bitmaps &GetBitmaps() { return *m_bitmaps; }
 
-};
+        const EstimatedScores &GetEstimatedScores() const { return *m_estimatedScores; }
+
+        const InputPaths &GetInputPaths() const { return m_inputPaths; }
+
+        const TargetPhraseImpl &GetInitPhrase() const { return *m_initPhrase; }
+
+        void Decode();
+
+        std::string OutputBest() const;
+
+        std::string OutputNBest();
+
+        virtual void OutputNBest(size_t nbest_size, std::vector <ResponseHypothesis> &nbest) const override;
+
+        std::string OutputTransOpt();
+
+        virtual void OutputAlignment(std::vector <std::pair<size_t, size_t>> &alignment) const override;
+
+    protected:
+        const mmt::logging::Logger logger;
+
+        InputPaths m_inputPaths;
+        Bitmaps *m_bitmaps;
+        EstimatedScores *m_estimatedScores;
+        TargetPhraseImpl *m_initPhrase;
+
+        Search *m_search;
+
+        // must be run in same thread as Decode()
+        void Init();
+
+        void CalcFutureScore();
+
+    };
 
 }
 
