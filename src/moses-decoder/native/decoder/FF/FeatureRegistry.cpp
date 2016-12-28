@@ -12,84 +12,76 @@
 
 using namespace std;
 
-namespace Moses2
-{
-template<class F>
-class DefaultFeatureFactory: public FeatureFactory
-{
-public:
-  FeatureFunction *Create(size_t startInd, const std::string &line)
-  {
-    return new F(startInd, line);
-  }
-};
+namespace Moses2 {
+    template<class F>
+    class DefaultFeatureFactory : public FeatureFactory {
+    public:
+        FeatureFunction *Create(size_t startInd, const std::string &line) {
+            return new F(startInd, line);
+        }
+    };
 
 ////////////////////////////////////////////////////////////////////
-FeatureRegistry::FeatureRegistry()
-{
-  // Feature with same name as class
+    FeatureRegistry::FeatureRegistry() : logger("decoder.FeatureRegistry") {
+        // Feature with same name as class
 #define MOSES_FNAME(name) Add(#name, new DefaultFeatureFactory< name >());
-  // Feature with different name than class.
+        // Feature with different name than class.
 #define MOSES_FNAME2(name, type) Add(name, new DefaultFeatureFactory< type >());
 
-  MOSES_FNAME2("SAPT", PhraseTableSADB);
+        MOSES_FNAME2("SAPT", PhraseTableSADB);
 
-  MOSES_FNAME2("MMTILM", MMTInterpolatedLM);
+        MOSES_FNAME2("MMTILM", MMTInterpolatedLM);
 
-  MOSES_FNAME(Distortion);
-  MOSES_FNAME(LexicalReordering);
-  MOSES_FNAME(PhrasePenalty);
-  MOSES_FNAME(WordPenalty);
-  MOSES_FNAME(UnknownWordPenalty);
-}
+        MOSES_FNAME(Distortion);
+        MOSES_FNAME(LexicalReordering);
+        MOSES_FNAME(PhrasePenalty);
+        MOSES_FNAME(WordPenalty);
+        MOSES_FNAME(UnknownWordPenalty);
+    }
 
-FeatureRegistry::~FeatureRegistry()
-{
+    FeatureRegistry::~FeatureRegistry() {
 
-}
+    }
 
-void FeatureRegistry::Add(const std::string &name, FeatureFactory *factory)
-{
-  std::pair<std::string, boost::shared_ptr<FeatureFactory> > to_ins(name,
-      boost::shared_ptr<FeatureFactory>(factory));
-  if (!registry_.insert(to_ins).second) {
-    cerr << "Duplicate feature name " << name << endl;
-    abort();
-  }
-}
+    void FeatureRegistry::Add(const std::string &name, FeatureFactory *factory) {
+        std::pair<std::string, boost::shared_ptr<FeatureFactory> > to_ins(name,
+                                                                          boost::shared_ptr<FeatureFactory>(factory));
+        if (!registry_.insert(to_ins).second) {
+            LogFatal(logger) << "Duplicate feature name '" << name << "'";
+            abort();
+        }
+    }
 
-FeatureFunction *FeatureRegistry::Construct(size_t startInd,
-    const std::string &name, const std::string &line)
-{
-  Map::iterator i = registry_.find(name);
-  if (i == registry_.end()) {
-    cerr << "Feature name " << name << " is not registered.";
-    abort();
-  }
-  FeatureFactory *fact = i->second.get();
-  FeatureFunction *ff = fact->Create(startInd, line);
-  return ff;
-}
+    FeatureFunction *FeatureRegistry::Construct(size_t startInd,
+                                                const std::string &name, const std::string &line) {
+        Map::iterator i = registry_.find(name);
+        if (i == registry_.end()) {
+            LogFatal(logger) << "Feature name '" << name << "' is not registered.";
+            abort();
+        }
+        FeatureFactory *fact = i->second.get();
+        FeatureFunction *ff = fact->Create(startInd, line);
+        return ff;
+    }
 
-void FeatureRegistry::PrintFF() const
-{
-  std::vector<std::string> ffs;
-  std::cerr << "Available feature functions:" << std::endl;
-  Map::const_iterator iter;
-  for (iter = registry_.begin(); iter != registry_.end(); ++iter) {
-    const std::string &ffName = iter->first;
-    ffs.push_back(ffName);
-  }
+    void FeatureRegistry::PrintFF() const {
+        std::vector<std::string> ffs;
+        std::cerr << "Available feature functions:" << std::endl;
+        Map::const_iterator iter;
+        for (iter = registry_.begin(); iter != registry_.end(); ++iter) {
+            const std::string &ffName = iter->first;
+            ffs.push_back(ffName);
+        }
 
-  std::vector<std::string>::const_iterator iterVec;
-  std::sort(ffs.begin(), ffs.end());
-  for (iterVec = ffs.begin(); iterVec != ffs.end(); ++iterVec) {
-    const std::string &ffName = *iterVec;
-    std::cerr << ffName << " ";
-  }
+        std::vector<std::string>::const_iterator iterVec;
+        std::sort(ffs.begin(), ffs.end());
+        for (iterVec = ffs.begin(); iterVec != ffs.end(); ++iterVec) {
+            const std::string &ffName = *iterVec;
+            std::cerr << ffName << " ";
+        }
 
-  std::cerr << std::endl;
-}
+        std::cerr << std::endl;
+    }
 
 }
 
